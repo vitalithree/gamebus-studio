@@ -1,0 +1,33 @@
+ion-card {
+    background-color: #fff;
+
+    ion-card-header {
+        padding-bottom: 0;
+
+        ion-card-title {
+            font-style: italic;
+        }
+    }
+}
+
+ion-item-divider {
+    margin-top: 32px;
+    font-weight: bold;
+
+    ion-icon {
+        margin: 0;
+        margin-right: 16px;
+    }
+}
+
+.text-danger {
+    color: var(--ion-color-danger);
+}
+
+.text-warning {
+    color: var(--ion-color-warning);
+}
+
+.text-success {
+    color: var(--ion-color-success);
+}

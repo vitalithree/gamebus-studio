@@ -1,0 +1,26 @@
+<?xml version="1.0" encoding="UTF-8"?>
+<svg width="236px" height="236px" viewBox="0 0 236 236" version="1.1" xmlns="http://www.w3.org/2000/svg" xmlns:xlink="http://www.w3.org/1999/xlink">
+    <!-- Generator: Sketch 63.1 (92452) - https://sketch.com -->
+    <title>logo-ggzsg</title>
+    <desc>Created with Sketch.</desc>
+    <g id="logo-ggzsg" stroke="none" stroke-width="1" fill="none" fill-rule="evenodd">
+        <g id="heart" transform="translate(16.000000, 17.000000)" fill-opacity="0.75">
+            <rect id="Rectangle" fill="#FD003F" x="117" y="0" width="67" height="24" rx="12"></rect>
+            <rect id="Rectangle" fill="#FD003F" x="89" y="32" width="116" height="24" rx="12"></rect>
+            <rect id="Rectangle" fill="#FD003F" x="75" y="64" width="121" height="24" rx="12"></rect>
+            <rect id="Rectangle" fill="#FD003F" x="104" y="96" width="64" height="24" rx="12"></rect>
+            <rect id="Rectangle" fill="#FD003F" x="105" y="128" width="38" height="24" rx="12"></rect>
+            <rect id="Rectangle" fill="#0B50D0" x="22" y="0" width="67" height="24" rx="12"></rect>
+            <rect id="Rectangle" fill="#0B50D0" x="0" y="32" width="134" height="24" rx="12"></rect>
+            <rect id="Rectangle" fill="#0B50D0" x="11" y="64" width="104" height="24" rx="12"></rect>
+            <rect id="Rectangle" fill="#0B50D0" x="60" y="96" width="83" height="24" rx="12"></rect>
+            <rect id="Rectangle" fill="#0B50D0" x="89" y="128" width="41" height="24" rx="12"></rect>
+        </g>
+        <text id="SAMEN-GEZOND" font-family="AvenirNextCondensed-Medium, Avenir Next Condensed" font-size="34.5" font-style="condensed" font-weight="400" fill="#747D8C">
+            <tspan x="16" y="205">SAMEN GEZOND</tspan>
+        </text>
+        <text id="GGZ" font-family="AvenirNextCondensed-Bold, Avenir Next Condensed" font-size="42.5" font-style="condensed" font-weight="bold" fill="#A4B0BE">
+            <tspan x="16" y="172">GGZ</tspan>
+        </text>
+    </g>
+</svg>

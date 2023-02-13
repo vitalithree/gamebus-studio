@@ -1,0 +1,186 @@
+<ng-container *ngIf="isLocked">
+  <ion-spinner></ion-spinner>
+</ng-container>
+
+
+<ion-card mode="md" *ngIf="!hasAccount && !isAuthenticated && signupForm">
+  <form [formGroup]="signupForm" autocomplete="off">
+    <ion-card-header>
+      <ion-card-title>{{ "c.g.onboarding.signup-1" | translate }}</ion-card-title>
+      <ion-card-subtitle>{{ "c.g.onboarding.signup-2" | translate }}</ion-card-subtitle>
+    </ion-card-header>
+
+    <ion-list>
+      <ion-item>
+        <ion-label position="stacked">
+          {{ "c.g.onboarding.email" | translate }} <ion-text color="danger">*</ion-text>
+          <p>
+            <span *ngIf="signupForm.get('email').touched && signupForm.get('email').errors?.pattern">
+              {{ "c.g.onboarding.email-invalid" | translate }}
+            </span>
+          </p>
+        </ion-label>
+        <ion-input type="email" placeholder="" formControlName="email" autocomplete="off"></ion-input>
+      </ion-item>
+
+      <ion-item>
+        <ion-label position="stacked">
+          {{ "c.g.onboarding.password" | translate }} <ion-text color="danger">*</ion-text>
+          <p>
+            <span *ngIf="signupForm.get('password').touched && signupForm.get('password').errors?.minlength">
+              {{ "c.g.onboarding.password-too-short" | translate }}
+            </span>
+            <span *ngIf="signupForm.get('password').touched && signupForm.get('password').errors?.maxlength">
+              {{ "c.g.onboarding.password-too-long" | translate }}
+            </span>
+          </p>
+        </ion-label>
+        <ion-input type="password" placeholder="" formControlName="password" autocomplete="off">
+        </ion-input>
+      </ion-item>
+      <ion-item>
+        <ion-label position="stacked">
+          {{ "c.g.onboarding.password-confirmation" | translate }} <ion-text color="danger">*</ion-text>
+          <p>
+            <span
+              *ngIf="signupForm.get('passwordconfirm').touched  && signupForm.get('passwordconfirm').errors?.passwordMismatch">
+              {{ "c.g.onboarding.passwords-do-not-match" | translate }}
+            </span>
+          </p>
+        </ion-label>
+        <ion-input type="password" placeholder="" formControlName="passwordconfirm" autocomplete="off">
+        </ion-input>
+      </ion-item>
+
+      <ion-item>
+        <ion-label position="stacked">
+          {{ "c.g.onboarding.firstname" | translate }} <ion-text color="danger">*</ion-text>
+          <p>
+            <span *ngIf="signupForm.get('firstName').touched && signupForm.get('firstName').errors?.minlength">
+              {{ "c.g.onboarding.input-too-short" | translate }}
+            </span>
+            <span *ngIf="signupForm.get('firstName').touched && signupForm.get('firstName').errors?.maxlength">
+              {{ "c.g.onboarding.input-too-long" | translate }}
+            </span>
+          </p>
+        </ion-label>
+        <ion-input type="text" placeholder="" formControlName="firstName" autocapitalize="on" autocomplete="off">
+        </ion-input>
+      </ion-item>
+
+      <ion-item>
+        <ion-label position="stacked">
+          {{ "c.g.onboarding.lastname" | translate }} <ion-text color="danger">*</ion-text>
+          <p>
+            <span *ngIf="signupForm.get('lastName').touched && signupForm.get('lastName').errors?.minlength">
+              {{ "c.g.onboarding.input-too-short" | translate }}
+            </span>
+            <span *ngIf="signupForm.get('lastName').touched && signupForm.get('lastName').errors?.maxlength">
+              {{ "c.g.onboarding.input-too-long" | translate }}
+            </span>
+          </p>
+        </ion-label>
+        <ion-input type="text" placeholder="" formControlName="lastName" autocapitalize="on" autocomplete="off"
+          (keydown.Tab)="$event.preventDefault()">
+        </ion-input>
+      </ion-item>
+
+    </ion-list>
+
+  </form>
+
+  <form *ngIf="consent?.form" [formGroup]="consent.form" autocomplete="off">
+    <ion-list>
+      <ion-list-header>
+        <ion-label><strong>{{ "c.g.onboarding.consent-1" | translate }}</strong></ion-label>
+      </ion-list-header>
+
+      <ion-item *ngFor="let item of consent.obj">
+        <ion-toggle color="success" [formControlName]="item.key" slot="start" (keydown.Tab)="$event.preventDefault()">
+        </ion-toggle>
+        <ion-label color="medium" class="ion-text-wrap">
+          <p>
+            {{ "c.g.onboarding.consent." + item.tk | translate }} <ion-text *ngIf="item.required" color="danger">*
+            </ion-text>
+          </p>
+        </ion-label>
+        <ion-buttons slot="end" *ngIf="item.link">
+          <ion-button [href]="item.link" target="_blank" color="medium">
+            <ion-icon slot="icon-only" name="information-circle-outline"></ion-icon>
+          </ion-button>
+        </ion-buttons>
+      </ion-item>
+
+    </ion-list>
+  </form>
+
+  <ion-card-content>
+    <ion-button expand="block" color="secondary" [disabled]="isLocked || !signupForm.valid || !consent.form.valid"
+      (click)="presentConfirmEmailAlert()">
+      <ion-spinner slot="start" *ngIf="isLocked; else label"></ion-spinner>
+      <ng-template #label>{{ "c.g.onboarding.signup" | translate }}</ng-template>
+    </ion-button>
+    <ion-button expand="block" fill="clear" color="dark" (click)="hasAccount = true">
+      {{ "c.g.onboarding.has-account" | translate }}
+    </ion-button>
+  </ion-card-content>
+
+</ion-card>
+
+<ion-card mode="md" *ngIf="hasAccount && !isAuthenticated && loginForm">
+  <form class="login" [formGroup]="loginForm" (keyup.enter)="doLogin()">
+    <ion-card-header>
+      <ion-card-title>{{ "c.g.onboarding.login-1" | translate }}</ion-card-title>
+      <ion-card-subtitle>{{ "c.g.onboarding.login-2" | translate }}</ion-card-subtitle>
+    </ion-card-header>
+
+    <ion-list *ngIf="!isBrowseriOS; else authiOS;">
+      <ion-item>
+        <ion-label position="stacked">{{ "c.g.onboarding.email" | translate }}</ion-label>
+        <ion-input type="email" placeholder="" formControlName="email"></ion-input>
+      </ion-item>
+      <ion-item>
+        <ion-label position="stacked">{{ "c.g.onboarding.password" | translate }}</ion-label>
+        <ion-input type="password" placeholder="" formControlName="password" (keydown.Tab)="$event.preventDefault()">
+        </ion-input>
+      </ion-item>
+    </ion-list>
+
+    <ng-template #authiOS>
+      <ion-list>
+        <ion-item>
+          <ion-label position="stacked">{{ "c.g.onboarding.email" | translate }}</ion-label>
+          <input type="text" name="username" autocomplete="username" (change)="prefillAuth($event)">
+          <ion-input type="email" placeholder="" formControlName="email"></ion-input>
+        </ion-item>
+        <ion-item>
+          <ion-label position="stacked">{{ "c.g.onboarding.password" | translate }}</ion-label>
+          <input type="password" name="password" autocomplete="current-password" (change)="prefillAuth($event)"
+            (keydown.Tab)="$event.preventDefault()">
+          <ion-input type="password" placeholder="" formControlName="password" (keydown.Tab)="$event.preventDefault()">
+          </ion-input>
+        </ion-item>
+      </ion-list>
+    </ng-template>
+
+
+
+    <ion-card-content>
+      <ion-button (click)="doLogin()" expand="block" color="secondary" [disabled]="isLocked || !loginForm.valid">
+        <ion-spinner slot="start" *ngIf="isLocked; else label"></ion-spinner>
+        <ng-template #label>{{ "c.g.onboarding.login" | translate }}</ng-template>
+      </ion-button>
+
+      <ion-button expand="block" fill="clear" color="dark" (click)="hasAccount = false">
+        {{ "c.g.onboarding.has-no-account" | translate }}
+      </ion-button>
+
+      <p style="margin-top: 16px;">{{ "c.g.onboarding.recover-password-1" | translate }} <a
+          routerLink="/onboarding/recover-password" (keydown.Tab)="$event.preventDefault()">{{
+          "c.g.onboarding.recover-password-2"
+          | translate }}</a></p>
+
+
+    </ion-card-content>
+  </form>
+</ion-card>

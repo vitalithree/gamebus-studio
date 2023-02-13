@@ -1,0 +1,34 @@
+<!DOCTYPE html>
+<html lang="en">
+
+<head>
+  <meta charset="UTF-8">
+  <title></title>
+  <link rel="stylesheet" href="https://cdnjs.cloudflare.com/ajax/libs/meyer-reset/2.0/reset.min.css">
+  <link rel="stylesheet" href="./style.css">
+</head>
+
+<body>
+  <div class="page">
+    <div class="overlay"></div>
+    <p class="quote">
+      <span id="quote"></span><br>
+      <strong id="author" class="quote--author"></strong>
+    </p>
+  </div>
+
+  <script>
+    const urlParams = new URLSearchParams(window.location.search);
+
+    const quote = urlParams.get('q');
+    document.getElementById('quote').textContent = quote;
+
+    const author = urlParams.get('a');
+    document.getElementById('author').textContent = author;
+
+    document.title = `${quote} - ${author}`;
+  </script>
+
+</body>
+
+</html>

@@ -1,0 +1,7 @@
+<div class="video" (click)="presentVideoOptions()">
+  <ion-icon name="videocam" *ngIf="!uri && !isUploading"></ion-icon>
+  <ion-spinner *ngIf="isUploading"></ion-spinner>
+  <plyr *ngIf="uri" plyrTitle="Recorded Video" [plyrPlaysInline]="true"
+    [plyrSources]="[{ src: uri + '?access_token=' + token, type: 'video/mp4' }]" [plyrOptions]="plyrOptions"></plyr>
+</div>
+<input id="browse" type="file" accept="video/*" (change)="loadVideo($event)" />

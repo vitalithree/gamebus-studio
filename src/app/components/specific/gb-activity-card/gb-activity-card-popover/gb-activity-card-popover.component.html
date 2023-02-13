@@ -1,0 +1,12 @@
+<ion-list style="margin: 0 0 4px 0;">
+
+  <ion-item *ngIf="isAdmin || activity.player.id === pid" (click)="deleteActivity()">
+    <ion-icon slot="start" color="danger" name="trash"></ion-icon>
+    <ion-label color="danger" class="ion-text-wrap">{{ 'c.s.activity-card.delete' | translate }}</ion-label>
+  </ion-item>
+
+  <ion-item *ngIf="isAdmin" (click)="confirmResetPoints()">
+    <ion-icon slot="start" color="danger" name="alert"></ion-icon>
+    <ion-label color="danger" class="ion-text-wrap">{{ 'c.s.activity-card.detect-fraud' | translate }}</ion-label>
+  </ion-item>
+</ion-list>

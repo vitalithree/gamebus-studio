@@ -1,0 +1,29 @@
+::ng-deep {
+    .can-go-back {
+        ion-menu-button {
+            display: none;
+        }
+    }
+}
+
+ion-card {
+    background-color: #fff;
+
+    ion-card-header {
+        padding-bottom: 0;
+
+        ion-card-title {
+            font-style: italic;
+            display: flex;
+        }
+        ion-icon {
+            margin-left: auto;
+            justify-self: flex-end;
+            cursor: pointer;
+        }
+    }
+}
+
+ion-modal {
+    --border-radius: 16px;
+}

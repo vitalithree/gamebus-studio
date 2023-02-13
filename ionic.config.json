@@ -1,0 +1,7 @@
+{
+  "name": "gamebus-studio",
+  "integrations": {
+    "capacitor": {}
+  },
+  "type": "angular"
+}

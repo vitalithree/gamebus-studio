@@ -1,0 +1,88 @@
+<app-header [segments]="[
+{name: 'Users', route: '/admin/dashboards/users', direction: 'forward'},
+{name: 'Groups', route: '/admin/dashboards/groups', direction: 'forward'},
+{name: 'Tasks', route: '/admin/dashboards/tasks', direction: 'forward'},
+{name: 'Challenges', route: '/admin/dashboards/challenges', direction: 'forward'},
+]">
+</app-header>
+
+<ion-content>
+
+  <ion-fab vertical="top" horizontal="end" slot="fixed" edge>
+    <ion-chip [ngClass]="{ fade: view.fab }">
+      <ion-label>Create challenge</ion-label>
+    </ion-chip>
+    <ion-fab-button color="secondary" routerLink="creator" routerDirection="forward">
+      <ion-icon name="add-outline"></ion-icon>
+    </ion-fab-button>
+  </ion-fab>
+
+  <ion-refresher slot="fixed" (ionRefresh)="parseData(true, $event)">
+    <ion-refresher-content></ion-refresher-content>
+  </ion-refresher>
+
+  <ion-grid class="ion-no-padding">
+    <ion-row style="justify-content: center;">
+      <ion-col size="12" size-md="9" class="ion-no-padding">
+
+        <ng-template #loading>
+          <ion-spinner></ion-spinner>
+        </ng-template>
+
+        <ng-container *ngIf="isReady; else loading">
+          <ion-card mode="md" *ngFor="let xpw of xpws">
+            <ion-card-header>
+
+              <ion-card-title [id]="'open-wave-modal-' + xpw.wave.id">
+                Wave {{ xpw.wave.id }}
+                <ion-icon name="add-circle-outline" size="large" color="medium"></ion-icon>
+              </ion-card-title>
+
+              <ion-popover [trigger]="'open-wave-modal-' + xpw.wave.id" side="end" dismissOnSelect="true">
+                <ng-template>
+                  <ion-list>
+                    <ion-item button (click)="createChallenges(xpw.wave.id, 'multilevel-all-individuals')"
+                      [disabled]="isLocked">
+                      <ion-label class="ion-text-wrap">Multilevel for all individuals</ion-label>
+                    </ion-item>
+                  </ion-list>
+                </ng-template>
+              </ion-popover>
+
+            </ion-card-header>
+
+            <ion-list>
+              <ng-container *ngFor="let challenge of xpw.challenges">
+
+                <ion-item-sliding class="circle-item">
+                  <ion-item [detail]="challenge.id" [routerLink]="[challenge.id]">
+                    <ion-avatar slot="start">
+                      <img [src]="challenge.image"
+                        (error)="$event.target.src = uris.assets + '/placeholders/ph-challenge.svg'">
+                    </ion-avatar>
+                    <ion-label class="ion-text-wrap">
+                      {{ challenge.name }}
+                      <p>
+                        xid = {{ challenge.id || 'null' }}<span *ngIf="challenge.id">, participants = {{
+                          challenge.participations?.length }}</span>
+                      </p>
+                    </ion-label>
+                  </ion-item>
+
+                  <ion-item-options side="end" *ngIf="challenge.id" (click)="deleteChallenge(challenge.id, $event)">
+                    <ion-item-option color="danger">
+                      Delete challenge
+                    </ion-item-option>
+                  </ion-item-options>
+                </ion-item-sliding>
+
+              </ng-container>
+            </ion-list>
+
+          </ion-card>
+        </ng-container>
+
+      </ion-col>
+    </ion-row>
+  </ion-grid>
+</ion-content>

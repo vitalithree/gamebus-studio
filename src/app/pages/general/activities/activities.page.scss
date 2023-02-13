@@ -1,0 +1,38 @@
+ion-card {
+    background-color: #fff;
+}
+
+.profile-card {
+    width: 100%;
+    margin: 0 0 16px 0;
+    border-radius: 0;
+    box-shadow: rgba(0, 0, 0, 0.2) 0px 3px 1px -2px, rgba(0, 0, 0, 0.14) 0px 2px 2px 0px, rgba(0, 0, 0, 0.12) 0px 1px 5px 0px;
+
+    @media (min-width: 576px) {
+        border-bottom-left-radius: 4px;
+        border-bottom-right-radius: 4px;
+    }
+
+    ion-list {
+        padding: 0;
+    }
+
+    ion-button {
+        margin-left: 0;
+    }
+}
+
+ion-list .split {
+    width: 100%;
+    display: flex;
+    align-items: center;
+
+    ion-item {
+        width: 50%;
+        --padding-start: 0;
+
+        ion-label {
+            text-align: center;
+        }
+    }
+}

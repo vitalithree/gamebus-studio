@@ -1,0 +1,5 @@
+<div class="image" (click)="presentPictureOptions()">
+  <ion-icon name="camera" *ngIf="!uri"></ion-icon>
+  <img *ngIf="uri" [src]="uri" (error)="uri = null" />
+</div>
+<input id="browse" *ngIf="isBrowser" type="file" accept="image/*" (change)="loadPicture($event)" />

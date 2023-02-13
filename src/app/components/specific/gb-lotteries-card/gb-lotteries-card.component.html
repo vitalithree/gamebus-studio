@@ -1,0 +1,61 @@
+<ng-template #loading>
+  <ion-row style="justify-content: center;">
+    <ion-spinner></ion-spinner>
+  </ion-row>
+</ng-template>
+
+
+<ng-container *ngIf="isReady; else loading;">
+
+  <ng-container *ngIf="lotteries?.length">
+    <ion-card mode="md">
+      <ion-card-header>
+        <ion-card-title>{{ "c.s.lotteries-card.lotteries" | translate}}</ion-card-title>
+      </ion-card-header>
+      <ion-list>
+        <ng-container *ngFor="let lottery of lotteries">
+          <ion-item (click)="updateView(lottery.id)">
+            <ion-avatar slot="start" *ngIf="lottery.image">
+              <img [src]="lottery.image" (error)="$event.target.style.display = 'none'">
+            </ion-avatar>
+            <ion-label class="ion-text-wrap">
+              {{ lottery.translationKey }}
+              <p>{{ "c.s.lotteries-card.combined-odds" | translate }} {{ lottery.odds }}</p>
+            </ion-label>
+
+            <ion-icon *ngIf="!view.includes(lottery.id)" slot="end" size="small" name="caret-down"></ion-icon>
+            <ion-icon *ngIf="view.includes(lottery.id)" slot="end" size="small" name="caret-up"></ion-icon>
+          </ion-item>
+
+          <ion-item-group *ngIf="view.includes(lottery.id)">
+
+            <ion-item-divider>
+              <ion-label>{{ "c.s.lotteries-card.rewards" | translate }}</ion-label>
+            </ion-item-divider>
+            <ng-container *ngIf="lottery.lotteryConfig?.length; else nowinner">
+
+              <ion-item class="user-item" (click)="updateView(lottery.id)" *ngFor="let lc of lottery.lotteryConfig">
+                <ion-avatar slot="start">
+                  <img [src]="lc.rewardConfig.rewardType.image" (error)="$event.target.style.display = 'none'">
+                </ion-avatar>
+                <ion-label class="ion-text-wrap">
+                  {{ lc.rewardConfig.rewardType.name }} &times; {{ lc.rewardConfig.rewardType.name }}
+                  <p>{{ "c.s.lotteries-card.at-odd" | translate}} {{ lc.odds }}</p>
+                </ion-label>
+              </ion-item>
+            </ng-container>
+            <ng-template #nowinner>
+              <ion-item>
+                <ion-label>
+                  <p>{{ "c.s.lotteries-card.no-winners-yet" | translate }}</p>
+                </ion-label>
+              </ion-item>
+            </ng-template>
+          </ion-item-group>
+        </ng-container>
+
+      </ion-list>
+    </ion-card>
+  </ng-container>
+
+</ng-container>

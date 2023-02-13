@@ -1,0 +1,209 @@
+<ng-template #loading>
+  <ion-row style="justify-content: center;">
+    <ion-spinner></ion-spinner>
+  </ion-row>
+</ng-template>
+
+<ng-container *ngIf="isReady; else loading;">
+
+  <ng-container *ngIf="!view.followees">
+    <div class="participants"
+      *ngIf="participants && participants.length > (settings.configurable ? 1 : 0); else empty;">
+      <ion-card mode="md" *ngFor="let participant of participants"
+        [ngClass]="{ 'isOwnedIndividual': participant.isOwned && participant.isPrivate, 'isOwnedGroup': participant.isOwned && !participant.isPrivate, 'break': participant.break }">
+        <!-- [routerLink]="participant.isPrivate && participant.isOwned ? ['/account'] : null" -->
+
+        <ion-list>
+          <ion-item>
+            <ion-chip slot="start" class="position">
+              <ion-label><strong>{{ participant.position }}</strong></ion-label>
+            </ion-chip>
+            <ion-avatar slot="start">
+              <img [src]="participant.image"
+                (error)="$event.target.src = !participant.pid ? uris.assets + '/placeholders/ph-group.svg' : uris.assets + '/placeholders/ph-fa-' + (participant.pid % 10) + '.svg'">
+            </ion-avatar>
+            <ion-label class="ion-text-wrap">
+              <span *ngIf="!participant.isPrivate">{{ "c.s.leaderboard.average-of" | translate }}</span>
+              {{ participant.name }}
+            </ion-label>
+            <ion-chip slot="end" [color]="participant.isWinning ? 'success': 'medium'">
+              <ion-label style="text-overflow: unset;">
+                <strong>{{ participant.points || 0 }}</strong> {{ "g.points-abbr" | translate }}
+              </ion-label>
+            </ion-chip>
+          </ion-item>
+        </ion-list>
+      </ion-card>
+
+    </div>
+
+
+    <ng-template #empty>
+      <ion-row *ngIf="settings.configurable" style="justify-content: center;">
+        <ion-col size="12" size-md="7">
+          <div class="empty-state">
+            <img [src]="uris.assets + '/empty-states/no-challenges.svg'" style="max-height: 40vh;">
+            <ion-text>
+              <h3>{{ "c.s.leaderboard.empty-1" | translate }}</h3>
+              <p>{{ "c.s.leaderboard.empty-2" | translate }}</p>
+            </ion-text>
+          </div>
+        </ion-col>
+      </ion-row>
+    </ng-template>
+
+    <ion-card *ngIf="settings.configurable" mode="md" style="margin: 32px 16px; padding-top: 0; cursor: pointer;"
+      (click)="view.followees = !view.followees">
+      <ion-buttons style="justify-content: center;">
+        <ion-button fill="clear" color="dark" [disabled]="isLocked">
+          <ion-icon slot="end" name="cog-outline"></ion-icon>
+          {{ "c.s.leaderboard.empty-3" | translate }}
+        </ion-button>
+      </ion-buttons>
+    </ion-card>
+
+  </ng-container>
+
+  <div class="participants" *ngIf="view.followees && settings.configurable">
+    <ion-card mode="md" style="padding-top: 0;">
+
+      <ion-buttons>
+        <ion-button fill="clear" color="dark" [disabled]="isLocked" (click)="updatePreferences()">
+          <ion-spinner slot="start" *ngIf="isLocked; else label"></ion-spinner>
+          <ng-template #label>
+            <ion-icon slot="start" name="arrow-back"></ion-icon>
+            {{ "c.s.leaderboard.save-configuration" | translate }}
+          </ng-template>
+        </ion-button>
+      </ion-buttons>
+
+      <ion-list>
+        <ng-container
+          *ngIf="(followees.all.groups && followees.all.groups.length > 0) || (followees.all.individuals && followees.all.individuals.length > 0)">
+          <ion-item lines="full">
+            <ion-searchbar [(ngModel)]="followees.search.query" (ionChange)="searchParticipant($event)"></ion-searchbar>
+          </ion-item>
+        </ng-container>
+
+        <ng-container *ngIf="followees.search.query; else all;">
+          <ng-container *ngIf="settings.groups && followees.search.groups && followees.search.groups.length > 0">
+            <ion-item-divider>
+              <ion-label>{{ "c.s.leaderboard.groups" | translate }}</ion-label>
+            </ion-item-divider>
+
+            <ion-item *ngFor="let participant of followees.search.groups">
+              <ion-avatar slot="start">
+                <img [src]="participant.image" (error)="$event.target.src = uris.assets + '/placeholders/ph-group.svg'">
+              </ion-avatar>
+              <ion-label>
+                {{ participant.name }}
+                <!-- <p *ngIf="participant.isOwned"><em>A group of yours</em></p> -->
+              </ion-label>
+              <ion-chip slot="end" color="medium">
+                <ion-label><strong>{{ participant.points || 0 }}</strong> {{ "g.points-abbr" | translate }}</ion-label>
+              </ion-chip>
+              <ion-button slot="end" shape="round" fill="outline" style="margin-left: 4px;"
+                [color]="!followees.preferred.includes(participant.cid) ? 'success' : 'danger'" [disabled]="isLocked"
+                (click)="updateFollowees(participant.cid)">
+                <ion-icon *ngIf="!followees.preferred.includes(participant.cid)" name="eye" slot="icon-only"></ion-icon>
+                <ion-icon *ngIf="followees.preferred.includes(participant.cid)" name="eye-off" slot="icon-only">
+                </ion-icon>
+              </ion-button>
+            </ion-item>
+          </ng-container>
+
+          <ng-container
+            *ngIf="settings.individuals && followees.search.individuals && followees.search.individuals.length > 0">
+            <ion-item-divider>
+              <ion-label>{{ "c.s.leaderboard.individuals" | translate }}</ion-label>
+            </ion-item-divider>
+
+            <ion-item *ngFor="let participant of followees.search.individuals">
+              <ion-avatar slot="start">
+                <img [src]="participant.image"
+                  (error)="$event.target.src = uris.assets + '/placeholders/ph-fa-' + (participant.pid % 10) + '.svg'">
+              </ion-avatar>
+              <ion-label>
+                {{ participant.name }}
+              </ion-label>
+              <ion-chip slot="end" color="medium">
+                <ion-label><strong>{{ participant.points || 0 }}</strong> {{ "g.points-abbr" | translate }}</ion-label>
+              </ion-chip>
+              <ion-button slot="end" shape="round" fill="outline" color="secondary" style="margin-left: 4px;"
+                [color]="!followees.preferred.includes(participant.cid) ? 'success' : 'danger'" [disabled]="isLocked"
+                (click)="updateFollowees(participant.cid)">
+                <ion-icon *ngIf="!followees.preferred.includes(participant.cid)" name="eye" slot="icon-only"></ion-icon>
+                <ion-icon *ngIf="followees.preferred.includes(participant.cid)" name="eye-off" slot="icon-only">
+                </ion-icon>
+              </ion-button>
+            </ion-item>
+          </ng-container>
+
+          <ng-container
+            *ngIf="(!settings.groups || (!followees.search.groups || followees.search.groups.length === 0)) && (!settings.individuals || (!followees.search.individuals || followees.search.individuals.length === 0))">
+            <ion-item>
+              <ion-label class="ion-text-wrap">
+                <em>{{ "c.s.leaderboard.no-search-results" | translate }}</em>
+              </ion-label>
+            </ion-item>
+          </ng-container>
+
+        </ng-container>
+        <ng-template #all>
+          <ng-container *ngIf="settings.groups && followees.all.groups && followees.all.groups.length > 0">
+            <ion-item-divider>
+              <ion-label>{{ "c.s.leaderboard.groups" | translate }}</ion-label>
+            </ion-item-divider>
+
+            <ion-item *ngFor="let participant of followees.all.groups">
+              <ion-avatar slot="start">
+                <img [src]="participant.image" (error)="$event.target.src = uris.assets + '/placeholders/ph-group.svg'">
+              </ion-avatar>
+              <ion-label>
+                {{ participant.name }}
+                <!-- <p *ngIf="participant.isOwned"><em>A group of yours</em></p> -->
+              </ion-label>
+              <ion-chip slot="end" color="medium">
+                <ion-label><strong>{{ participant.points || 0 }}</strong> {{ "g.points-abbr" | translate }}</ion-label>
+              </ion-chip>
+              <ion-button slot="end" shape="round" fill="outline" style="margin-left: 4px;"
+                [color]="!followees.preferred.includes(participant.cid) ? 'success' : 'danger'" [disabled]="isLocked"
+                (click)="updateFollowees(participant.cid)">
+                <ion-icon *ngIf="!followees.preferred.includes(participant.cid)" name="eye" slot="icon-only"></ion-icon>
+                <ion-icon *ngIf="followees.preferred.includes(participant.cid)" name="eye-off" slot="icon-only">
+                </ion-icon>
+              </ion-button>
+            </ion-item>
+          </ng-container>
+
+          <ng-container
+            *ngIf="settings.individuals && followees.all.individuals && followees.all.individuals.length > 0">
+            <ion-item-divider>
+              <ion-label>{{ "c.s.leaderboard.individuals" | translate }}</ion-label>
+            </ion-item-divider>
+
+            <ion-item *ngFor="let participant of followees.all.individuals">
+              <ion-avatar slot="start">
+                <img [src]="participant.image"
+                  (error)="$event.target.src = uris.assets + '/placeholders/ph-fa-' + (participant.pid % 10) + '.svg'">
+              </ion-avatar>
+              <ion-label class="ion-text-wrap">
+                {{ participant.name }}
+              </ion-label>
+              <ion-chip slot="end" color="medium">
+                <ion-label><strong>{{ participant.points || 0 }}</strong> {{ "g.points-abbr" | translate }}</ion-label>
+              </ion-chip>
+              <ion-button slot="end" shape="round" fill="outline" color="secondary" style="margin-left: 4px;"
+                [color]="!followees.preferred.includes(participant.cid) ? 'success' : 'danger'" [disabled]="isLocked"
+                (click)="updateFollowees(participant.cid)">
+                <ion-icon *ngIf="!followees.preferred.includes(participant.cid)" name="eye" slot="icon-only"></ion-icon>
+                <ion-icon *ngIf="followees.preferred.includes(participant.cid)" name="eye-off" slot="icon-only">
+                </ion-icon>
+              </ion-button>
+            </ion-item>
+          </ng-container>
+        </ng-template>
+      </ion-list>
+    </ion-card>
+  </div>
+</ng-container>

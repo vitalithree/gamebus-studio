@@ -1,0 +1,54 @@
+<ng-template #loading>
+  <ion-row style="justify-content: center;">
+    <ion-spinner></ion-spinner>
+  </ion-row>
+</ng-template>
+
+
+<ng-container *ngIf="isReady; else loading;">
+
+  <ng-container *ngIf="streaks?.length">
+
+    <ion-card mode="md" *ngFor="let streak of streaks">
+      <ion-list>
+
+        <ion-item lines="full" color="dark">
+          <ion-avatar slot="start">
+            <img [src]="streak.participant.image"
+              (error)="$event.target.src = !streak.participant.pid ? uris.assets + '/placeholders/ph-group.svg' : uris.assets + '/placeholders/ph-fa-' + (streak.participant.pid % 10) + '.svg'">
+          </ion-avatar>
+          <ion-label>
+            {{ streak.participant.name }}
+          </ion-label>
+        </ion-item>
+
+        <div style="display: flex; flex: 1;">
+          <ion-item lines="inset" color="dark" style="width: 33%;">
+            <ion-label position="stacked">{{ "c.s.streak-card.min" | translate }}</ion-label>
+            <ion-text>
+              {{ streak.min }}
+              <ion-note>{{ "c.s.streak-card.days" | translate }}</ion-note>
+            </ion-text>
+          </ion-item>
+          <ion-item lines="inset" color="dark" style="width: 33%;">
+            <ion-label position="stacked">{{ "c.s.streak-card.max" | translate }}</ion-label>
+            <ion-text>
+              {{ streak.max }}
+              <ion-note>{{ "c.s.streak-card.days" | translate }}</ion-note>
+            </ion-text>
+          </ion-item>
+          <ion-item lines="inset" color="dark" style="width: 33%;">
+            <ion-label position="stacked">{{ "c.s.streak-card.current" | translate}}</ion-label>
+            <ion-text [color]="!streak.cur ? 'danger' : 'success'">
+              {{ streak.cur }}
+              <ion-note>{{ "c.s.streak-card.days" | translate }}</ion-note>
+            </ion-text>
+          </ion-item>
+        </div>
+
+
+      </ion-list>
+    </ion-card>
+  </ng-container>
+
+</ng-container>

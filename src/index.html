@@ -1,0 +1,79 @@
+<!DOCTYPE html>
+<html lang="en">
+
+<head>
+  <meta charset="utf-8" />
+  <title>GameBus Studio</title>
+
+  <base href="/" />
+
+  <meta name="color-scheme" content="light dark" />
+  <meta name="viewport"
+    content="viewport-fit=cover, width=device-width, initial-scale=1.0, minimum-scale=1.0, maximum-scale=1.0, user-scalable=no" />
+  <meta name="format-detection" content="telephone=no" />
+  <meta name="msapplication-tap-highlight" content="no" />
+
+  <link rel="icon" type="image/png" href="assets/icons/favicon.png" />
+
+  <!-- add to homescreen for ios -->
+  <link rel="apple-touch-icon" href="assets/icons/apple-icon-180.png">
+  <meta name="apple-mobile-web-app-capable" content="yes" />
+  <meta name="apple-mobile-web-app-status-bar-style" content="black-translucent" />
+  <link rel="manifest" href="manifest.webmanifest">
+  <meta name="theme-color" content="#4294FF">
+
+  <style>
+    #preloader {
+      background-color: #f4f5f8;
+      position: fixed;
+      z-index: 999;
+      top: 0;
+      right: 0;
+      bottom: 0;
+      left: 0;
+      display: flex;
+      flex-direction: column;
+      justify-content: center;
+      align-items: center;
+    }
+
+    #preloader img {
+      width: 80%;
+      max-width: 256px;
+      margin-bottom: 24px;
+    }
+
+    #preloader .spinner {
+      width: 36px;
+      height: 36px;
+      border-style: solid;
+      border-color: #636e72;
+      border-top-color: transparent;
+      border-width: 4px;
+      border-radius: 50%;
+      animation: spin .8s linear infinite;
+    }
+
+    @keyframes spin {
+      from {
+        transform: rotate(0deg);
+      }
+
+      to {
+        transform: rotate(360deg);
+      }
+    }
+  </style>
+</head>
+
+<body>
+  <div id="preloader">
+    <img src="./assets/icons/icon.svg">
+    <div class="spinner"></div>
+  </div>
+
+  <app-root></app-root>
+  <noscript>Please enable JavaScript to continue using this application.</noscript>
+</body>
+
+</html>

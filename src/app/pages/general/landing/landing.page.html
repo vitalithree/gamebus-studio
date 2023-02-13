@@ -1,0 +1,119 @@
+<app-header [title]="config ? config.campaign.name : ('p.g.landing.search-campaign' | translate)"></app-header>
+
+<ion-content>
+
+  <ion-grid class="ion-no-padding">
+
+    <ng-template #loading>
+      <ion-row style="justify-content: center;">
+        <ion-spinner></ion-spinner>
+      </ion-row>
+    </ng-template>
+
+    <ion-row style="justify-content: center;" *ngIf="isReady; else loading;">
+      <ion-col size="12" size-md="7" size-xl="5" class="ion-no-padding">
+
+        <ion-card mode="md" *ngIf="config; else search">
+          <ion-card-content *ngIf="config.campaign?.logo"
+            style="background-color: var(--ion-color-light); margin-bottom: 16px;">
+            <ion-img [src]="config.campaign.logo" style="width: 256px; height: 256px; margin: 0 auto;"></ion-img>
+          </ion-card-content>
+
+          <ion-card-header>
+            <ion-card-title>{{ "p.g.landing.about-this-campaign" | translate }}</ion-card-title>
+          </ion-card-header>
+
+          <ion-card-content>
+            <p *ngIf="config.campaign?.description" [innerHTML]="config.campaign.description | mdToHtml"></p>
+
+            <ion-card *ngIf="group" mode="md" style="margin-top: 32px;">
+              <ion-list style="background-color: var(--ion-color-light);">
+                <ion-item color="light">
+                  <ion-avatar slot="start">
+                    <img [src]="group.image" (error)="$event.target.src = uris.assets + '/placeholders/ph-group.svg'">
+                  </ion-avatar>
+                  <ion-label>
+                    <p>{{ "p.g.landing.you-will-join" | translate }}:</p>
+                    {{ group.name }}
+                  </ion-label>
+                </ion-item>
+              </ion-list>
+            </ion-card>
+
+            <ion-button *ngIf="!isAuthenticated" style="margin-top: 24px;" [routerLink]="['/onboarding/authentication']"
+              [queryParams]="{ c: config.campaign.href, g: group?.cid }" expand="block" fill="outline"
+              color="secondary">
+              {{ "p.g.landing.yes-sign-me-up" | translate }}
+            </ion-button>
+          </ion-card-content>
+
+          <ng-container *ngIf="config.campaign.contactEmail && config.campaign.contactPerson">
+            <ion-card-header>
+              <ion-card-title>{{ "p.g.landing.contact" | translate }}</ion-card-title>
+            </ion-card-header>
+            <ion-card-content>
+              <p
+                [innerHTML]="'p.g.landing.contact-1' | translate:{ email: config.campaign?.contactEmail, person: config.campaign?.contactPerson }">
+              </p>
+            </ion-card-content>
+          </ng-container>
+
+        </ion-card>
+
+        <ng-template #search>
+          <ion-card mode="md">
+            <form [formGroup]="queryForm" (keyup.enter)="parseConfig()">
+              <ion-card-content
+                style="background-color: var(--ion-color-light); margin-bottom: 16px; display: flex; justify-content: center;">
+                <img [src]="uris.assets + '/empty-states/no-challenges.svg'" style="height: 250px;">
+              </ion-card-content>
+              <ion-card-header>
+                <ion-card-title>{{ "p.g.landing.search-campaign" | translate }}</ion-card-title>
+              </ion-card-header>
+              <ion-list>
+                <ion-item>
+                  <ion-label position="stacked">
+                    {{ "p.g.landing.campaign-name" | translate }} <ion-text color="danger">*</ion-text>
+                  </ion-label>
+                  <ion-input type="text" formControlName="chref" clear-on-edit></ion-input>
+                </ion-item>
+              </ion-list>
+
+              <ion-card-content>
+                <ion-button expand="block" color="secondary" [disabled]="isLocked || !queryForm.valid"
+                  (click)="parseConfig()">
+                  <ion-spinner slot="start" *ngIf="isLocked; else label"></ion-spinner>
+                  <ng-template #label>{{ "p.g.landing.verify-campaign-name" | translate }}</ng-template>
+                </ion-button>
+              </ion-card-content>
+            </form>
+
+          </ion-card>
+        </ng-template>
+      </ion-col>
+
+
+    </ion-row>
+
+
+
+
+    <!-- <ion-row style="justify-content: center;">
+        <ion-col size="12" size-md="7">
+          <div class="empty-state">
+
+            <img [src]="uris.assets + '/empty-states/no-challenges.svg'">
+
+            <ion-text>
+              <h3>{{ "p.g.landing.empty-2" | translate }}</h3>
+              <p>{{ "p.g.landing.empty-3" | translate }}</p>
+            </ion-text>
+
+          </div>
+        </ion-col>
+      </ion-row> -->
+
+
+
+  </ion-grid>
+</ion-content>

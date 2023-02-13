@@ -1,0 +1,38 @@
+<ng-template #loading>
+  <ion-spinner></ion-spinner>
+</ng-template>
+
+<ng-container *ngIf="isReady else loading">
+  <ion-card mode="md">
+    <ion-card-content>
+      <h3>{{ wallet }}/{{ challenge.target }}</h3>
+      <h4 style="text-transform: uppercase;">{{ 'g.points' | translate }}</h4>
+      <p style="margin-top: 16px;" *ngIf="settings?.description" [innerHTML]="settings.description | mdToHtml">
+      </p>
+    </ion-card-content>
+    <ion-card-content class="position">
+      <div>
+        <h4>{{ "c.s.progress-card.my-current-performance" | translate }}</h4>
+        <div style="position: relative;">
+          <progress [value]="wallet" [max]="challenge.target"></progress>
+          <div class="milestones">
+            <div *ngFor="let n of [].constructor(settings.milestones + 1); let i = index;"
+              [ngClass]="{ stillMilestone: math.floor(wallet / (challenge.target / (settings.milestones + 1))) < i}">
+              <h4 *ngIf="math.floor(wallet / (challenge.target / (settings.milestones + 1))) < i; else gotlMilestone">
+                ?
+              </h4>
+              <ng-template #gotlMilestone>
+                <h4>{{ settings.milestoneLabel }}</h4>
+              </ng-template>
+            </div>
+          </div>
+        </div>
+        <p *ngIf="wallet >= challenge.target">
+          <strong>{{ 'c.s.progress-card.congratulations' | translate }}</strong>
+          <br>
+          {{ 'c.s.progress-card.reached-target' | translate }}
+        </p>
+      </div>
+    </ion-card-content>
+  </ion-card>
+</ng-container>

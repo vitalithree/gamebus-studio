@@ -1,0 +1,78 @@
+<app-header [segments]="[
+{name: 'Users', route: '/admin/dashboards/users', direction: 'forward'},
+{name: 'Groups', route: '/admin/dashboards/groups', direction: 'forward'},
+{name: 'Tasks', route: '/admin/dashboards/tasks', direction: 'forward'},
+{name: 'Challenges', route: '/admin/dashboards/challenges', direction: 'forward'},
+]">
+</app-header>
+<ion-content>
+
+  <ion-refresher slot="fixed" (ionRefresh)="parseData(true, $event)">
+    <ion-refresher-content></ion-refresher-content>
+  </ion-refresher>
+
+  <ion-grid class="ion-no-padding">
+    <ion-row style="justify-content: center;">
+      <ion-col size="12" size-md="9" class="ion-no-padding">
+
+        <ng-template #loading>
+          <ion-spinner></ion-spinner>
+        </ng-template>
+
+        <ng-container *ngIf="isReady; else loading">
+
+          <ion-button mode="md" expand="block" fill="outline" color="dark" routerDirection="root"
+            (click)="createMissingCircles()" [disabled]="isLocked" style="margin: 16px 9px;">
+            Create all missing circles
+          </ion-button>
+
+          <ion-card mode="md" *ngFor="let gtype of gtypes">
+            <ion-card-header>
+              <ion-card-title>{{ gtype.name }}</ion-card-title>
+            </ion-card-header>
+
+            <ion-list>
+              <ng-container *ngFor="let group of gtype.groups">
+
+                <ion-item-sliding class="circle-item">
+                  <ion-item [detail]="group.cid" [routerLink]="group.cid ? [group.cid]: []">
+                    <ion-avatar slot="start">
+                      <img [src]="group.image" (error)="$event.target.src = uris.assets + '/placeholders/ph-group.svg'">
+                    </ion-avatar>
+                    <ion-label class="ion-text-wrap">
+                      {{ group.name }}
+                      <p>
+                        cid = {{ group.cid || 'null' }}, members = {{ group.members || 'null' }}
+                        <span *ngIf="group.assignment === 'from-url'">
+                          <br>
+                          invite = {{ group.name | circleUrl:config.campaign.href }}
+                        </span>
+                      </p>
+                    </ion-label>
+
+                    <ion-button slot="end" *ngIf="!group.cid" (click)="createCircle(group.name, $event)" fill="outline"
+                      color="success" [disabled]="isLocked">
+                      <ion-spinner slot="start" *ngIf="isLocked; else label"></ion-spinner>
+                      <ng-template #label>Create circle</ng-template>
+                    </ion-button>
+                  </ion-item>
+
+                  <ion-item-options side="end" *ngIf="group.cid">
+                    <ion-item-option color="danger" (click)="deleteCircle(group.name, $event)" [disabled]="isLocked">
+                      Delete circle
+                    </ion-item-option>
+                  </ion-item-options>
+                </ion-item-sliding>
+
+              </ng-container>
+            </ion-list>
+
+          </ion-card>
+
+
+        </ng-container>
+
+      </ion-col>
+    </ion-row>
+  </ion-grid>
+</ion-content>

@@ -1,0 +1,106 @@
+<app-header [title]="!isReady ? null : !user.isSelf ? user.firstname + ' ' + user.lastname : null"
+  [segments]="isReady && user.isSelf ? [{name: ('p.g.activities.my-activities' | translate), route: '/account', direction: 'root'},
+  { name: ('p.g.notifications.my-notifications' | translate), route: '/notifications', direction: 'forward', badge: state.alerts.unread.all }] : null">
+</app-header>
+
+<ion-content>
+
+  <ion-refresher slot="fixed" (ionRefresh)="parseData($event)">
+    <ion-refresher-content></ion-refresher-content>
+  </ion-refresher>
+
+  <ion-grid class="ion-no-padding">
+
+    <ion-row style="justify-content: center;">
+      <ion-col size="12" size-md="7" class="ion-no-padding">
+
+        <ion-card mode="md" class="profile-card" *ngIf="isReady">
+          <ion-list>
+            <ion-item lines="full" *ngIf="user">
+              <ion-avatar slot="start">
+                <img [src]="user.image" (error)="$event.target.src = uris.assets + '/placeholders/ph-user.svg'">
+              </ion-avatar>
+              <ion-label>
+                <p *ngIf="user.isSelf">{{ "p.g.activities.my-account" | translate }}</p>
+                <strong>{{ user.firstname + ' ' + user.lastname }}</strong>
+              </ion-label>
+
+              <ion-button *ngIf="user.isSelf" mode="ios" slot="end" fill="clear" shape="round" color="medium"
+                (click)="view.all = !view.all">
+                <ion-icon slot="icon-only" [name]="view.all ? 'eye-off-outline' : 'eye-outline'"
+                  style="width: 24px; height: 24px;"></ion-icon>
+              </ion-button>
+
+              <ion-button *ngIf="user.isSelf" mode="ios" slot="end" fill="clear" shape="round" color="medium"
+                style="margin-right: 1px; --padding-end: 0;" routerLink="settings" routerDirection="forward">
+                <ion-icon slot="icon-only" name="cog-outline" style="width: 24px; height: 24px;"></ion-icon>
+              </ion-button>
+
+            </ion-item>
+
+          </ion-list>
+        </ion-card>
+
+        <ng-template #loading>
+          <ion-spinner></ion-spinner>
+        </ng-template>
+
+        <ng-container *ngIf="isReady; else loading;">
+          <ng-container></ng-container>
+
+          <ng-container
+            *ngIf="(view.all && activities?.all?.length > 0) || (!view.all && activities?.rewarded?.length > 0); else empty">
+
+            <ng-container *ngIf="!view.all">
+              <app-activity-card *ngFor="let activity of activities.rewarded" [activity]="activity"></app-activity-card>
+            </ng-container>
+
+            <ng-container *ngIf="view.all">
+              <app-activity-card *ngFor="let activity of activities.all" [activity]="activity"></app-activity-card>
+            </ng-container>
+
+            <ion-infinite-scroll (ionInfinite)="parseData($event)">
+              <ion-infinite-scroll-content></ion-infinite-scroll-content>
+            </ion-infinite-scroll>
+
+          </ng-container>
+
+          <ng-template #empty>
+            <div class="empty-state">
+
+              <ng-container *ngIf="user.isSelf; else friend;">
+                <img [src]="uris.assets + '/empty-states/no-activities.svg'">
+                <ion-text>
+                  <h3>{{ "p.g.activities.empty-1" | translate }}</h3>
+                  <p>{{ "p.g.activities.empty-2" | translate }}</p>
+                </ion-text>
+
+                <ion-button mode="md" expand="block" fill="outline" color="secondary" routerDirection="root"
+                  routerLink="/tasks">
+                  {{ "p.g.activities.empty-3" | translate }}
+                </ion-button>
+
+                <ion-button *ngIf="activities?.all?.length" mode="md" expand="block" fill="clear" color="medium"
+                  routerDirection="root" (click)="view.all = !view.all">
+                  {{ "p.g.activities.empty-4" | translate }}
+                </ion-button>
+
+              </ng-container>
+
+              <ng-template #friend>
+                <ng-container>
+                  <img [src]="uris.assets + '/empty-states/no-activities.svg'">
+                  <ion-text>
+                    <h3>{{ "p.g.activities.empty-1" | translate }}</h3>
+                  </ion-text>
+                </ng-container>
+              </ng-template>
+            </div>
+          </ng-template>
+
+        </ng-container>
+      </ion-col>
+    </ion-row>
+  </ion-grid>
+
+</ion-content>

@@ -1,0 +1,8 @@
+<ion-radio-group (ionChange)="updateValue($event.detail.value)">
+  <ion-item lines="none" *ngFor="let e of enum">
+    <ion-label class="ion-text-wrap">
+      {{ e.translationKey | translate }}
+    </ion-label>
+    <ion-radio slot="end" [value]="e.enumValue" color="secondary" [disabled]="disabled"></ion-radio>
+  </ion-item>
+</ion-radio-group>

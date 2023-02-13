@@ -1,0 +1,57 @@
+.custom-segment {
+    width: 100%;
+    display: flex;
+    justify-content: center;
+
+    div {
+        padding: 1px 2px;
+        background-color: rgba(#fff, 0.15);
+        border-radius: 8px;
+
+        ion-button {
+            margin: 0;
+            --padding-start: 12px;
+            --padding-end: 12px;
+            --background: transparent;
+            --background-hover-opacity: 0;
+            --background-activated-opacity: 0;
+            font-size: 0.8rem;
+            font-weight: 500;
+
+            &.active {
+                --background: #fff;
+                --color: var(--ion-color-primary);
+            }
+
+            .badge {
+                min-width: 18px;
+                padding: 3px 6px;
+                margin-left: 6px;
+                font-size: .7rem;
+                font-weight: 700;
+                background-color: rgba(#000, .15);
+                border-radius: 8px;
+                text-align: center;
+                overflow: hidden;
+            }
+
+
+            &.active .badge {
+                color: #000;
+            }
+
+        }
+    }
+}
+
+ion-header.md .custom-segment ion-button {
+    font-size: 1rem;
+}
+
+ion-toolbar {
+    &[color="secondary"] {
+        .active {
+            --color: var(--ion-color-secondary);
+        }
+    }
+}

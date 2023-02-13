@@ -1,0 +1,36 @@
+<ion-card *ngIf="form" mode="md">
+    <form [formGroup]="form" autocomplete="off">
+        <ion-list>
+            <ion-list-header>
+                <ion-label><strong>{{ "c.g.onboarding.consent-1" | translate }}</strong></ion-label>
+            </ion-list-header>
+
+            <ion-item *ngFor="let item of consent">
+                <ion-toggle color="success" [formControlName]="item.key" slot="start"
+                    (keydown.Tab)="$event.preventDefault()">
+                </ion-toggle>
+                <ion-label color="medium" class="ion-text-wrap">
+                    <p>
+                        {{ "c.g.onboarding.consent." + item.tk | translate }} <ion-text *ngIf="item.required"
+                            color="danger">*
+                        </ion-text>
+                    </p>
+                </ion-label>
+                <ion-buttons slot="end" *ngIf="item.link">
+                    <ion-button [href]="item.link" target="_blank" color="medium">
+                        <ion-icon slot="icon-only" name="information-circle-outline"></ion-icon>
+                    </ion-button>
+                </ion-buttons>
+            </ion-item>
+
+        </ion-list>
+
+        <ion-card-content>
+            <ion-button expand="block" color="secondary" [disabled]="isLocked || !form.valid" (click)="storeConsent()">
+                <ion-spinner slot="start" *ngIf="isLocked; else label"></ion-spinner>
+                <ng-template #label>{{ "c.g.onboarding.give-consent" | translate }}</ng-template>
+            </ion-button>
+        </ion-card-content>
+    </form>
+
+</ion-card>

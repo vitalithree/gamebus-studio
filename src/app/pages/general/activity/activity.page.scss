@@ -1,0 +1,11 @@
+ion-card {
+    background-color: #fff;
+}
+
+::ng-deep {
+    .can-go-back {
+        ion-menu-button {
+            display: none;
+        }
+    }
+}

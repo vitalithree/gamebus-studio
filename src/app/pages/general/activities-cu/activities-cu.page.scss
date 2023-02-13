@@ -1,0 +1,44 @@
+ion-card.explanation {
+    background-color: var(--ion-color-light);
+
+    ion-card-header {
+        background-color: #A5C4D4;
+        // background-image: radial-gradient(circle farthest-corner at 10% 20%, rgba(253, 101, 133, 1) 0%, rgba(255, 211, 165, 1) 90%);
+        background-size: cover;
+
+        ion-button {
+            margin: 24px 0 0 0;
+            --color: #fff;
+            --ripple-color: transparent;
+        }
+    }
+
+    ion-card-content {
+        padding-top: 16px;
+        border-top: 1px solid var(--ion-item-border-color, var(--ion-border-color, var(--ion-color-step-150, rgba(0, 0, 0, 0.13))));
+
+        +ion-list {
+            border-top: 1px solid var(--ion-item-border-color, var(--ion-border-color, var(--ion-color-step-150, rgba(0, 0, 0, 0.13))));
+        }
+    }
+
+    ion-card-title {
+        color: #fff;
+        font-weight: bold;
+    }
+}
+
+.masonry {
+    columns: 3 285px;
+    column-gap: 0;
+    max-width: 900px;
+    margin: 0 auto;
+
+    app-rule-card {
+        width: 100%;
+        page-break-inside: avoid;
+        break-inside: avoid-column;
+        display: table;
+    }
+
+  }

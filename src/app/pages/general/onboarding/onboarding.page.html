@@ -1,0 +1,73 @@
+<app-header [title]="'p.g.onboarding.onboarding' | translate" [hidemenu]="true">
+  <ion-buttons custom-end-buttons slot="end">
+    <app-language-select color="light" [isLocked]="isLocked"></app-language-select>
+  </ion-buttons>
+</app-header>
+
+<ion-toolbar color="primary" mode="md">
+  <ion-segment [value]="segment" (ionChange)="setSegment($event.detail.value)" scrollable>
+    <ion-segment-button *ngIf="isAuthenticated" value="logout" (click)="presentConfirmLogout()">
+      <ion-icon name="log-out-outline" style="transform: scaleX(-1)"></ion-icon>
+    </ion-segment-button>
+
+    <ion-segment-button *ngIf="!isAuthenticated" value="authentication">
+      <ion-icon name="log-in-outline"></ion-icon>
+    </ion-segment-button>
+    <ion-segment-button value="consent" [disabled]="!isAuthenticated">
+      <ion-icon name="list-outline"></ion-icon>
+    </ion-segment-button>
+    <ion-segment-button value="personalinfo" [disabled]="!isAuthenticated || !state?.consent?.passing">
+      <ion-icon name="person-outline"></ion-icon>
+    </ion-segment-button>
+    <ion-segment-button value="groups" [disabled]="!isAuthenticated || !state?.consent?.passing || !gtypes?.length">
+      <ion-icon name="people-outline"></ion-icon>
+    </ion-segment-button>
+
+    <ion-segment-button [routerLink]="['/']" value="forward-to-app" routerDirection="root"
+      [disabled]="!isAuthenticated || !state?.consent?.passing">
+      <ion-icon name="arrow-redo-outline"></ion-icon>
+    </ion-segment-button>
+  </ion-segment>
+</ion-toolbar>
+
+
+<ion-content>
+
+  <ion-refresher slot="fixed" (ionRefresh)="parseData($event)">
+    <ion-refresher-content></ion-refresher-content>
+  </ion-refresher>
+
+  <ion-grid class="ion-no-padding">
+    <ion-row style="justify-content: center;">
+      <ion-col size="12" size-md="7" size-lg="5" class="ion-no-padding">
+
+        <ng-template #loading>
+          <ion-spinner></ion-spinner>
+        </ng-template>
+
+        <ng-container *ngIf="isReady; else loading">
+
+          <ng-container [ngSwitch]="segment">
+            <app-authentication *ngSwitchCase="'authentication'" [chref]="config.campaign.href" [cid]="cid"
+              (segmentEvent)="nextSegment()" (signupEvent)="didSignup = true"></app-authentication>
+
+            <ng-container *ngIf="isAuthenticated">
+              <app-consent *ngSwitchCase="'consent'" (segmentEvent)="nextSegment()"></app-consent>
+            </ng-container>
+
+            <ng-container *ngIf="isAuthenticated && state?.consent?.passing">
+              <app-personalinfo *ngSwitchCase="'personalinfo'" (segmentEvent)="nextSegment()"></app-personalinfo>
+
+              <app-groups *ngSwitchCase="'groups'" [gtypes]="gtypes" (segmentEvent)="nextSegment()">
+              </app-groups>
+            </ng-container>
+          </ng-container>
+
+        </ng-container>
+
+      </ion-col>
+    </ion-row>
+  </ion-grid>
+
+
+</ion-content>

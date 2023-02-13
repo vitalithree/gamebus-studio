@@ -1,0 +1,48 @@
+<ng-template #loading>
+  <ion-spinner></ion-spinner>
+</ng-template>
+
+<ng-container *ngIf="isReady && lotteries?.length else loading">
+  <ion-card mode="md" *ngFor="let lottery of lotteries">
+    <ion-card-content class="split">
+      <div>
+        <h3>{{ wallet }}</h3>
+        <h4 style="text-transform: uppercase;">{{ 'g.points' | translate }}</h4>
+        <p style="margin-top: 16px;" *ngIf="settings?.description" [innerHTML]="settings.description | mdToHtml">
+        </p>
+      </div>
+      <div style="text-align: center;">
+        <div class="loot" [ngClass]="{ 'isSpinning': lottery.isSpinning }">
+          <img *ngIf="!lottery.result" class="closed" src="assets/imgs/loot-box/box-closed.svg">
+          <img *ngIf="lottery.result === 'lucky'" src="assets/imgs/loot-box/box-open-lucky.svg">
+          <img *ngIf="lottery.result === 'empty'" src="assets/imgs/loot-box/box-open-empty.svg">
+        </div>
+
+        <ion-button (click)="spin(lottery)" mode="ios" expand="block" color="dark" size="small" fill="outline"
+          [disabled]="!isReady || isLocked || !isActive || lottery.isSpinning || wallet < lottery.pointsRequired">
+          <ion-spinner slot="start" *ngIf="lottery.isSpinning; else la;" color="dark">
+          </ion-spinner>
+          <ng-template #la>
+            {{ 'c.s.lootbox-card.open-lootbox' | translate }}
+          </ng-template>
+        </ion-button>
+        <p><em>{{ 'c.s.lootbox-card.gamble-costs' | translate:{ costs: lottery.pointsRequired } }}</em></p>
+      </div>
+    </ion-card-content>
+
+    <ion-card-content class="position">
+      <div>
+        <h4>{{ 'c.s.lootbox-card.my-current-performance' | translate }}</h4>
+        <div *ngFor="let reward of lottery.rewards" style="padding: 8px 0;">
+          <h3>{{ reward.count }}</h3>
+          <h3 style="color: var(--ion-color-medium-tint)">&times;</h3>
+          <div style="display: flex; flex-direction: column; justify-content: center; align-items: center;">
+            <img *ngIf="reward.image" style="width: 100px; height: 100px;" [src]="reward.image"
+              (error)="$event.target.src = uris.assets + '/placeholders/ph-reward.svg'">
+            <p style="margin-top: 8px;"><strong>{{ reward.name }}</strong></p>
+          </div>
+        </div>
+      </div>
+    </ion-card-content>
+  </ion-card>
+</ng-container>

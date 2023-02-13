@@ -1,0 +1,137 @@
+<html>
+    <head>
+        <style>
+            @charset "UTF-8";
+            * {
+                box-sizing: border-box;
+            }
+
+            body {
+                min-height: 100vh;
+                color: #fff;
+                display: -webkit-box;
+                display: flex;
+                -webkit-box-pack: center;
+                justify-content: center;
+                -webkit-box-align: center;
+                align-items: center;
+                background-color: #000;
+            }
+
+            blockquote {
+                font-size: 1.8rem;
+                position: absolute;
+                width: 90%;
+                max-width: 700px;
+                text-align: center;
+            }
+
+            cite {
+                display: block;
+                text-align: right;
+                font-family: Verdana, Arial, sans-serif;
+                margin-top: .8rem;
+                font-size: .8rem;
+                color: #888;
+                font-style: normal;
+            }
+
+            blockquote q {
+                font-family: Georgia, serif;
+                font-style: italic;
+                letter-spacing: 0.1rem;
+            }
+
+            blockquote q span {
+                will-change: opacity, filter;
+                opacity: 0;
+                -webkit-filter: blur(0px);
+                filter: blur(0px);
+            }
+
+            q {
+                quotes: "\201C""\201D""\2019""\2018";
+            }
+
+            q:before {
+                content: open-quote;
+                margin-right: 0.8rem;
+            }
+
+            q:after {
+                content: close-quote;
+            }
+
+            q:before,
+            q:after {
+                color: #ccc;
+                font-size: 2rem;
+            }
+        </style>
+    </head>
+    <body>
+
+        <blockquote>
+            <q id="quote"></q>
+            <cite id="author"></cite>
+        </blockquote>
+
+        <script>
+            function splitWords() {
+                let quote = document.getElementById("quote");
+                quote.innerText.replace(/(<([^>]+)>)/gi, "");
+                (quotewords = quote.innerText.split(" ")), (wordCount = quotewords.length);
+                quote.innerHTML = "";
+                for (let i = 0; i < wordCount; i++) {
+                    quote.innerHTML += "<span>" + quotewords[i] + "</span>";
+                    if (i < quotewords.length - 1) {
+                        quote.innerHTML += " ";
+                    }
+                }
+                quotewords = document.querySelectorAll("blockquote q span");
+                fadeWords(quotewords);
+            }
+
+            function getRandom(min, max) {
+                return Math.random() * (max - min) + min;
+            }
+
+            function fadeWords(quotewords) {
+                Array.prototype.forEach.call(quotewords, function (word) {
+                    let animate = word.animate(
+                        [
+                            {
+                                opacity: 0,
+                                filter: "blur(" + getRandom(2, 5) + "px)",
+                            },
+                            {
+                                opacity: 1,
+                                filter: "blur(0px)",
+                            },
+                        ],
+                        {
+                            duration: 1000,
+                            delay: getRandom(500, 3300),
+                            fill: "forwards",
+                        }
+                    );
+                });
+            }
+
+
+            const urlParams = new URLSearchParams(window.location.search);
+
+            const quote = urlParams.get("q");
+            if (quote.length === 0) {
+            } else {
+                document.getElementById("quote").textContent = quote;
+            }
+
+            const author = urlParams.get("a");
+            document.getElementById("author").textContent = author;
+
+            document.title = `${quote} - ${author}`;
+            splitWords();
+        </script>
+    </body>
+</html>

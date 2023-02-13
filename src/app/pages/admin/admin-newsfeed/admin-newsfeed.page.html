@@ -1,0 +1,64 @@
+<app-header title="Admin newsfeed"></app-header>
+
+<ion-content>
+
+
+  <ion-refresher *ngIf="isReady" slot="fixed" (ionRefresh)="parseData(true, $event)">
+    <ion-refresher-content></ion-refresher-content>
+  </ion-refresher>
+
+  <ion-grid class="ion-no-padding">
+
+    <ion-row style="justify-content: center;">
+      <ion-col size="12" size-md="7" class="ion-no-padding">
+
+        <ng-template #loading>
+          <ion-spinner></ion-spinner>
+        </ng-template>
+
+        <ng-container *ngIf="isReady; else loading">
+          <ng-container *ngIf="state.newsfeed?.items?.length; else empty">
+
+            <ion-card mode="md">
+              <ion-list [formGroup]="form">
+                <ion-item>
+                  <ion-label position="stacked">Activity IDs</ion-label>
+                  <ion-input type="text" formControlName="aids"></ion-input>
+                </ion-item>
+              </ion-list>
+              <ion-card-content>
+                <ion-button (click)="recalculatePoints()" [disabled]="!form.valid" expand="block" color="secondary">
+                  <ion-spinner slot="start" *ngIf="isLocked; else label"></ion-spinner>
+                  <ng-template #label>Recalculate points</ng-template>
+                </ion-button>
+              </ion-card-content>
+            </ion-card>
+
+            <ng-container *ngFor="let activity of activities; let i = index;">
+              <p style="margin-top: 36px; text-align: right; margin-right: 16px;">aid = {{ activity.id }}</p>
+              <app-activity-card [activity]="activity"></app-activity-card>
+            </ng-container>
+
+          </ng-container>
+        </ng-container>
+
+        <ng-template #empty>
+          <div class="empty-state">
+            <img [src]="uris.assets + '/empty-states/no-news.svg'">
+            <ion-text>
+              <h3>Newsfeed is empty</h3>
+            </ion-text>
+          </div>
+
+        </ng-template>
+
+      </ion-col>
+    </ion-row>
+
+  </ion-grid>
+
+  <ion-infinite-scroll *ngIf="isReady" (ionInfinite)="parseData(false, $event)">
+    <ion-infinite-scroll-content></ion-infinite-scroll-content>
+  </ion-infinite-scroll>
+
+</ion-content>

@@ -1,0 +1,76 @@
+<app-header [title]="page?.tk | translate"></app-header>
+
+<ion-content>
+
+  <ion-refresher slot="fixed" (ionRefresh)="parseData(true, $event)">
+    <ion-refresher-content></ion-refresher-content>
+  </ion-refresher>
+
+  <ion-grid class="ion-no-padding">
+    <ng-template #loading>
+      <ion-row style="justify-content: center;">
+        <ion-spinner></ion-spinner>
+      </ion-row>
+    </ng-template>
+
+    <ng-container *ngIf="isReady; else loading;">
+      <ng-container *ngIf="tasks?.length; else empty;">
+
+        <ion-row style="justify-content: center;">
+
+          <div class="masonry">
+            <app-rule-card *ngFor="let task of tasks" (click)="presentActivityModal(task)" [task]="task"
+              [hasProvider]="hasProvider" (connectedProvider)="getProviders()"></app-rule-card>
+          </div>
+
+        </ion-row>
+      </ng-container>
+
+
+
+      <ng-template #empty>
+        <ion-row style="justify-content: center;">
+          <ion-col size="12" size-md="7">
+            <div class="empty-state">
+
+              <img [src]="uris.assets + '/empty-states/no-rules.svg'">
+
+              <ng-container *ngIf="canSelect; else wait">
+                <ion-button mode="md" expand="block" fill="outline" color="secondary" routerDirection="forward"
+                  routerLink="/tasks/select">
+                  {{ "p.g.activities-cu.select-tasks" | translate }}
+                </ion-button>
+              </ng-container>
+
+              <ng-template #wait>
+                <ion-text>
+                  <h3>{{ "p.g.activities-cu.empty-1" | translate }}</h3>
+                  <p>
+                    <span *ngIf="nextwave"
+                      [innerHtml]="'p.g.activities-cu.empty-2' | translate:{ moment: ( nextwave.start | momentDateFormat:'dddd D MMMM' ) }"></span>
+                    <span *ngIf="!nextwave">{{ "p.g.activities-cu.empty-3" | translate }}</span>
+                  </p>
+                </ion-text>
+              </ng-template>
+
+            </div>
+          </ion-col>
+        </ion-row>
+
+      </ng-template>
+    </ng-container>
+
+  </ion-grid>
+
+
+  <ion-fab *ngIf="isReady && canSelect" vertical="top" horizontal="end" slot="fixed" edge>
+    <ion-chip [ngClass]="{ fade: view.fab }">
+      <ion-label>{{ "p.g.activities-cu.update-tasks" | translate }}</ion-label>
+    </ion-chip>
+    <ion-fab-button color="secondary" routerLink="/tasks/select" routerDirection="forward">
+      <ion-icon name="add"></ion-icon>
+    </ion-fab-button>
+  </ion-fab>
+
+
+</ion-content>

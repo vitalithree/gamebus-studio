@@ -1,0 +1,120 @@
+<app-header [title]="'p.g.settings.settings' | translate" backbutton="/account"></app-header>
+
+<ion-content>
+
+  <ion-refresher slot="fixed" (ionRefresh)="getProviders($event)">
+    <ion-refresher-content></ion-refresher-content>
+  </ion-refresher>
+
+  <form style="width: 100%;" *ngIf="userForm" [formGroup]="userForm" (ngSubmit)="putUser()">
+    <ion-list lines="inset" mode="md">
+      <ion-list-header>
+        <ion-label>
+          <strong>{{ "p.g.settings.account" | translate }}</strong>
+          <p>{{ "p.g.settings.username" | translate }}: {{ user.details.email }}</p>
+        </ion-label>
+      </ion-list-header>
+
+      <ion-item lines="inset">
+        <ion-label position="stacked">{{ "p.g.settings.profile-picture" | translate }}</ion-label>
+        <app-image-input [uri]="user.details.image" formControlName="image"></app-image-input>
+      </ion-item>
+      <ion-item lines="inset">
+        <ion-label position="stacked">{{ "p.g.settings.firstname" | translate }}</ion-label>
+        <ion-input formControlName="firstname"></ion-input>
+      </ion-item>
+      <ion-item lines="inset">
+        <ion-label position="stacked">{{ "p.g.settings.lastname" | translate }}</ion-label>
+        <ion-input formControlName="lastname"></ion-input>
+      </ion-item>
+      <ion-item lines="full">
+        <ion-label class="ion-text-wrap">
+          <p><em>{{ "p.g.settings.privacy-warning" | translate }}</em></p>
+        </ion-label>
+      </ion-item>
+      <ion-item lines="full">
+        <ion-button expand="block" fill="outline" color="secondary" (click)="putUser()"
+          [disabled]="isLocked || !userForm.valid">
+          <ion-spinner slot="start" *ngIf="isLocked; else label"></ion-spinner>
+          <ng-template #label>{{ "p.g.settings.update-account" | translate }}</ng-template>
+        </ion-button>
+      </ion-item>
+    </ion-list>
+
+  </form>
+
+  <ion-list lines="inset" mode="md">
+    <ion-list-header>
+      <ion-label><strong>{{ "p.g.settings.language-settings" | translate }}</strong></ion-label>
+    </ion-list-header>
+
+    <ion-item lines="inset">
+      <ion-label>{{ "p.g.settings.select-language" | translate }}</ion-label>
+      <ion-buttons slot="end">
+        <app-language-select color="dark" [isLocked]="isLocked"></app-language-select>
+      </ion-buttons>
+    </ion-item>
+  </ion-list>
+
+
+  <ion-list lines="inset" mode="md" style="margin-top: 8px;">
+    <ion-list-header>
+      <ion-label><strong>{{ "p.g.settings.providers" | translate }}</strong></ion-label>
+    </ion-list-header>
+    <ng-container *ngIf="providers !== undefined; else loading;">
+      <ng-container *ngIf="providers.length > 0; else empty;">
+        <ion-item *ngFor="let provider of providers">
+          <ion-thumbnail slot="start">
+            <img [src]="provider.image">
+          </ion-thumbnail>
+          <ion-label>
+            {{ provider.name }}
+            <p>{{ provider.description }}</p>
+          </ion-label>
+          <ion-button slot="end" fill="outline" *ngIf="!provider.isConnected" [href]="provider.connectUrl"
+            target="_blank">
+            {{ "p.g.settings.connect" | translate }}
+          </ion-button>
+          <ion-button slot="end" fill="outline" color="danger" *ngIf="provider.isConnected"
+            [href]="provider.disconnectUrl" target="_blank">
+            {{ "p.g.settings.disconnect" | translate }}
+          </ion-button>
+        </ion-item>
+      </ng-container>
+
+      <ng-template #empty>
+        <ion-item>
+          <ion-label class="ion-text-wrap">
+            <em>{{ "p.g.settings.providers-empty-1" | translate }}</em>
+            <p>{{ "p.g.settings.providers-empty-2" | translate }}</p>
+          </ion-label>
+        </ion-item>
+      </ng-template>
+    </ng-container>
+
+    <ng-template #loading>
+      <ion-item class="ion-text-center">
+        <ion-label>
+          <ion-spinner></ion-spinner>
+        </ion-label>
+      </ion-item>
+    </ng-template>
+  </ion-list>
+
+
+  <ion-list mode="md" style="margin-top: 8px;">
+    <ion-list-header>
+      <ion-label><strong>{{ "p.g.settings.other-settings" | translate }}</strong></ion-label>
+    </ion-list-header>
+
+    <ion-button style="margin: 0 16px;" expand="block" fill="outline" (click)="presentPasswordModal()" color="medium">
+      {{ "p.g.settings.change-password" | translate }}
+    </ion-button>
+
+    <ion-button style="margin: 16px;" expand="block" fill="outline" (click)="doLogout()" color="medium">
+      {{ "p.g.settings.log-off" | translate }}
+    </ion-button>
+
+  </ion-list>
+
+</ion-content>

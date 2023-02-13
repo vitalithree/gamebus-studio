@@ -1,0 +1,67 @@
+<app-header [segments]="[
+{name: 'Users', route: '/admin/dashboards/users', direction: 'forward'},
+{name: 'Groups', route: '/admin/dashboards/groups', direction: 'forward'},
+{name: 'Tasks', route: '/admin/dashboards/tasks', direction: 'forward'},
+{name: 'Challenges', route: '/admin/dashboards/challenges', direction: 'forward'},
+]">
+</app-header>
+
+<ion-content>
+
+  <ion-refresher slot="fixed" (ionRefresh)="parseData(true, $event)">
+    <ion-refresher-content></ion-refresher-content>
+  </ion-refresher>
+
+  <ion-grid class="ion-no-padding">
+    <ion-row style="justify-content: center;">
+      <ion-col size="12" size-md="9" class="ion-no-padding">
+
+        <ng-template #loading>
+          <ion-spinner></ion-spinner>
+        </ng-template>
+
+        <ng-container *ngIf="isReady; else loading">
+          <ion-card mode="md" *ngFor="let treatment of treatments">
+            <ion-card-header>
+              <ion-card-title>Wave {{ treatment.wave.id }}</ion-card-title>
+            </ion-card-header>
+
+            <ion-list>
+              <ng-container *ngFor="let g of treatment.groups">
+
+                <ion-item-sliding class="circle-item">
+                  <ion-item [detail]="g.xid" [routerLink]="g.xid ? ['/admin/dashboards/challenges/', g.xid] : []">
+                    <ion-avatar slot="start">
+                      <img [src]="g.group.image"
+                        (error)="$event.target.src = uris.assets + '/placeholders/ph-challenge-tasks.svg'">
+                    </ion-avatar>
+                    <ion-label class="ion-text-wrap">
+                      {{ g.group.name }}
+                      <p>
+                        cid = {{ g.group.cid || null }}, xid = {{ g.xid || 'null' }}
+                      </p>
+                    </ion-label>
+
+                    <ion-button slot="end" *ngIf="!g.xid" [disabled]="!g.group.cid"
+                      (click)="createChallenge(treatment.wave.id, g.group.cid, $event)" fill="outline" color="success">
+                      Create challenge
+                    </ion-button>
+                  </ion-item>
+
+                  <ion-item-options side="end" *ngIf="g.xid" (click)="deleteChallenge(g.xid, $event)">
+                    <ion-item-option color="danger">
+                      Delete challenge
+                    </ion-item-option>
+                  </ion-item-options>
+                </ion-item-sliding>
+
+              </ng-container>
+            </ion-list>
+
+          </ion-card>
+        </ng-container>
+
+      </ion-col>
+    </ion-row>
+  </ion-grid>
+</ion-content>

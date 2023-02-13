@@ -1,0 +1,41 @@
+ion-card {
+    background-color: #fff;
+}
+
+.user-item {
+    ion-icon[slot="end"] {
+        margin-left: 4px;
+    }
+}
+
+.circle-item {
+    ion-label .state-tag {
+        float: right;
+        margin-left: 8px;
+        margin-right: 6px;
+        color: var(--ion-color-medium);
+    }
+}
+
+ion-item-divider {
+    margin-top: 32px;
+    font-weight: bold;
+
+    ion-icon {
+        margin: 0;
+        margin-right: 16px;
+        cursor: pointer;
+    }
+}
+
+.text-danger {
+    color: var(--ion-color-danger);
+}
+
+.text-warning {
+    color: var(--ion-color-warning);
+}
+
+.text-success {
+    color: var(--ion-color-success);
+}

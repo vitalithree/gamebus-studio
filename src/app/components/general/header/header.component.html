@@ -1,0 +1,29 @@
+<ion-header>
+  <ion-toolbar [color]="color">
+    <ion-buttons *ngIf="!hidemenu" slot="start">
+      <ion-back-button text="" [defaultHref]="backbutton ? backbutton : undefined"></ion-back-button>
+      <ion-menu-button></ion-menu-button>
+    </ion-buttons>
+
+    <ion-title *ngIf="title; else loading;">{{ title }}</ion-title>
+    <ng-template #loading>
+      <ion-title *ngIf="!segments">
+        <ion-spinner></ion-spinner>
+      </ion-title>
+    </ng-template>
+
+    <div class="custom-segment" *ngIf="segments">
+      <div>
+        <ion-button *ngFor="let segment of segments" mode="ios" size="small" routerLinkActive="active"
+          [routerLink]="segment.route" [routerDirection]="segment.direction ? segment.direction : 'root'">
+          {{ segment.name }}
+          <div class="badge" *ngIf="segment.badge">
+            {{ segment.badge >= 99 ? '99+' : segment.badge }}
+          </div>
+        </ion-button>
+      </div>
+    </div>
+
+    <ng-content select="[custom-end-buttons]"></ng-content>
+  </ion-toolbar>
+</ion-header>

@@ -1,0 +1,32 @@
+<ion-radio-group (ionChange)="updateValue($event.detail.value)">
+  <ion-item lines="none">
+    <ion-label class="ion-text-wrap">
+      {{ 'c.g.inputs.completely-agree' | translate }}
+    </ion-label>
+    <ion-radio slot="start" [value]="!reverse ? 5 : 1" color="secondary" [disabled]="disabled"></ion-radio>
+  </ion-item>
+  <ion-item lines="none">
+    <ion-label class="ion-text-wrap">
+      {{ 'c.g.inputs.agree' | translate }}
+    </ion-label>
+    <ion-radio slot="start" [value]="!reverse ? 4 : 2" color="secondary" [disabled]="disabled"></ion-radio>
+  </ion-item>
+  <ion-item lines="none">
+    <ion-label class="ion-text-wrap">
+      {{ 'c.g.inputs.neutral' | translate }}
+    </ion-label>
+    <ion-radio slot="start" [value]="3" color="secondary" [disabled]="disabled"></ion-radio>
+  </ion-item>
+  <ion-item lines="none">
+    <ion-label class="ion-text-wrap">
+      {{ 'c.g.inputs.disagree' | translate }}
+    </ion-label>
+    <ion-radio slot="start" [value]="!reverse ? 2 : 4" color="secondary" [disabled]="disabled"></ion-radio>
+  </ion-item>
+  <ion-item lines="none">
+    <ion-label class="ion-text-wrap">
+      {{ 'c.g.inputs.completely-disagree' | translate }}
+    </ion-label>
+    <ion-radio slot="start" [value]="!reverse ? 1 : 5" color="secondary" [disabled]="disabled"></ion-radio>
+  </ion-item>
+</ion-radio-group>

@@ -1,0 +1,33 @@
+:host {
+    width: 100%;
+    margin-bottom: 8px;
+}
+
+input {
+    display: none;
+}
+
+.image {
+    width: 100%;
+    min-height: 80px;
+    max-height: 350px;
+    margin: 8px 0;
+    overflow: hidden;
+    border-radius: 8px;
+    background-color: var(--ion-color-light);
+    display: flex;
+    justify-content: center;
+    align-items: center;
+
+    ion-icon {
+        height: 36px;
+        width: 36px;
+        margin: 64px 0;
+    }
+
+    img {
+        max-height: 350px !important;
+        overflow: hidden;
+        border-radius: 8px;
+    }
+}

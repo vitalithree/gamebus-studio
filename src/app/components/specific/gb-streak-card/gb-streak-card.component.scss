@@ -1,0 +1,25 @@
+ion-list {
+    background-color: var(--ion-color-dark);
+
+    ion-text {
+        margin-top: 8px;
+        font-size: 2.5rem;
+        color: var(--ion-color-dark-contrast);
+        display: flex;
+        align-items: center;
+
+        &[color="danger"] {
+            color: var(--ion-color-danger);
+        }
+
+        &[color="success"] {
+            color: var(--ion-color-success);
+        }
+
+        ion-note {
+            margin-left: 8px;
+            font-size: .75rem;
+            color: var(--ion-color-medium);
+        }
+    }
+}

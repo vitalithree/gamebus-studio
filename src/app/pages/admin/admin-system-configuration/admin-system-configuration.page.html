@@ -1,0 +1,186 @@
+<app-header title="System configuration">
+  <ion-buttons custom-end-buttons slot="end">
+    <ion-button *ngIf="isAuthenticated" (click)="logout()">
+      <ion-icon name="log-out-outline" style="transform: scaleX(-1)"></ion-icon>
+    </ion-button>
+    <ion-button *ngIf="!isAuthenticated" routerLink="/landing">
+      <ion-icon name="home-outline" style="transform: scaleX(-1)"></ion-icon>
+    </ion-button>
+  </ion-buttons>
+</app-header>
+
+<ion-content>
+
+  <ion-refresher *ngIf="isAuthenticated && dataprovider" slot="fixed" (ionRefresh)="parseData($event)">
+    <ion-refresher-content></ion-refresher-content>
+  </ion-refresher>
+
+  <ion-grid class="ion-no-padding">
+    <ion-row style="justify-content: center;">
+      <ng-template #loading>
+        <ion-spinner></ion-spinner>
+      </ng-template>
+
+      <ng-container *ngIf="isReady; else loading">
+
+        <ion-col size="12" size-md="9" class="ion-no-padding" *ngIf="!isAuthenticated">
+          <ion-card mode="md" *ngIf="loginForm">
+            <form class="login" [formGroup]="loginForm" (keyup.enter)="doLogin()">
+              <ion-card-header>
+                <ion-card-title>{{ "c.g.onboarding.login-1" | translate }}</ion-card-title>
+                <ion-card-subtitle>{{ "c.g.onboarding.login-2" | translate }}</ion-card-subtitle>
+              </ion-card-header>
+
+              <ion-list *ngIf="!isBrowseriOS; else authiOS;">
+                <ion-item>
+                  <ion-label position="stacked">{{ "c.g.onboarding.email" | translate }}</ion-label>
+                  <ion-input type="email" placeholder="" formControlName="email"></ion-input>
+                </ion-item>
+                <ion-item>
+                  <ion-label position="stacked">{{ "c.g.onboarding.password" | translate }}</ion-label>
+                  <ion-input type="password" placeholder="" formControlName="password"
+                    (keydown.Tab)="$event.preventDefault()">
+                  </ion-input>
+                </ion-item>
+              </ion-list>
+
+              <ng-template #authiOS>
+                <ion-list>
+                  <ion-item>
+                    <ion-label position="stacked">{{ "c.g.onboarding.email" | translate }}</ion-label>
+                    <input type="text" name="username" autocomplete="username" (change)="prefillAuth($event)">
+                    <ion-input type="email" placeholder="" formControlName="email"></ion-input>
+                  </ion-item>
+                  <ion-item>
+                    <ion-label position="stacked">{{ "c.g.onboarding.password" | translate }}</ion-label>
+                    <input type="password" name="password" autocomplete="current-password"
+                      (change)="prefillAuth($event)" (keydown.Tab)="$event.preventDefault()">
+                    <ion-input type="password" placeholder="" formControlName="password"
+                      (keydown.Tab)="$event.preventDefault()">
+                    </ion-input>
+                  </ion-item>
+                </ion-list>
+              </ng-template>
+
+
+
+              <ion-card-content>
+                <ion-button (click)="doLogin()" expand="block" color="secondary"
+                  [disabled]="isLocked || !loginForm.valid">
+                  <ion-spinner slot="start" *ngIf="isLocked; else label"></ion-spinner>
+                  <ng-template #label>{{ "c.g.onboarding.login" | translate }}</ng-template>
+                </ion-button>
+
+                <p style="margin-top: 16px;">{{ "c.g.onboarding.recover-password-1" | translate }} <a
+                    routerLink="/onboarding/recover-password" (keydown.Tab)="$event.preventDefault()">{{
+                    "c.g.onboarding.recover-password-2"
+                    | translate }}</a></p>
+
+
+              </ion-card-content>
+            </form>
+          </ion-card>
+        </ion-col>
+
+        <ion-col size="12" size-md="9" class="ion-no-padding" *ngIf="isAuthenticated">
+
+          <ion-card class="full" mode="md">
+            <ion-card-header>
+              <ion-card-title>
+                Overview
+                <ion-icon *ngIf="dataprovider && dataprovider.client?.id && hasAllPropertyPermissions"
+                  name="shield-checkmark-outline" color="success"></ion-icon>
+                <ion-icon *ngIf="!dataprovider || !dataprovider.client || !hasAllPropertyPermissions" name="bug-outline"
+                  color="danger"></ion-icon>
+              </ion-card-title>
+              <ion-card-subtitle>
+                Configuration is {{ !dataprovider || !dataprovider.client?.id || !hasAllPropertyPermissions ? 'NOT' : ''
+                }} complete.
+                <span *ngIf="isAdmin && dataprovider && !dataprovider.client?.id">The data provider is not linked to a
+                  client, please contact your system administrator.</span>
+                <span *ngIf="isAdmin && !hasAllPropertyPermissions">The data provider does not have all property
+                  permissions.</span>
+                <span *ngIf="!isAdmin">To make updates, you need to be admin. You are not admin. Please contact you
+                  system administrator.</span>
+              </ion-card-subtitle>
+            </ion-card-header>
+
+            <ion-buttons *ngIf="isAdmin && !dataprovider">
+              <ion-button fill="clear" color="dark" (click)="createDataprovider()" [disabled]="isLocked">
+                <ion-spinner slot="start" *ngIf="isLocked; else label;"></ion-spinner>
+                <ng-template #label>
+                  <ion-icon slot="start" name="extension-puzzle-outline"></ion-icon>
+                  Try to create data provider
+                </ng-template>
+              </ion-button>
+            </ion-buttons>
+
+            <ion-buttons *ngIf="isAdmin && dataprovider && !hasAllPropertyPermissions">
+              <ion-button fill="clear" color="dark" (click)="addAllPermissions()" [disabled]="isLocked">
+                <ion-spinner slot="start" *ngIf="isLocked; else label;"></ion-spinner>
+                <ng-template #label>
+                  <ion-icon slot="start" name="create-outline"></ion-icon>
+                  Add all missing property permisions
+                </ng-template>
+              </ion-button>
+            </ion-buttons>
+
+            <ion-list  *ngIf="isAdmin && dataprovider?.client" lines="none">
+              <ion-item>
+                <strong>Client details</strong>
+              </ion-item>
+              <ion-item style="--padding-bottom: 16px;">
+                <ion-label position="stacked" color="dark" class="ion-text-wrap">
+                  ID
+                  <ion-text color="medium">assumed to be <em>{{ client.id }}</em> in current env.</ion-text>
+                </ion-label>
+                <ion-text>{{ dataprovider.client.clientId }} (id = {{ dataprovider.client.id }})</ion-text>
+              </ion-item>
+              <ion-item>
+                <ion-label position="stacked" color="dark" class="ion-text-wrap">
+                  Secret
+                  <ion-text color="medium">assumed to be <em>{{ client.secret }}</em> in current env.</ion-text>
+                </ion-label>
+                <ion-input [(ngModel)]="dataprovider.client.secret" placeholder="Your new secret here…"></ion-input>
+                <ion-button slot="end" fill="outline" style="align-self: center;" (click)="updateClient()">
+                  <ion-icon name="key-outline" slot="start"></ion-icon>
+
+                  <ion-spinner slot="start" *ngIf="isLocked; else label"></ion-spinner>
+                  <ng-template #label>Update</ng-template>
+                </ion-button>
+              </ion-item>
+            </ion-list>
+          </ion-card>
+
+          <ng-container *ngIf="dataprovider">
+            <ion-card *ngFor="let atype of atypes">
+              <ion-card-header style="padding-bottom: 4px;">
+                <ion-card-title>Activity = {{ 'atypes.' + atype.activity | translate }}</ion-card-title>
+                <ion-card-subtitle>Properties =</ion-card-subtitle>
+              </ion-card-header>
+              <ion-card-content style="padding-top: 0;">
+                <ion-chip outline color="primary" *ngFor="let property of atype.properties.actual">
+                  <ion-label>{{ 'props.' + property | translate }}</ion-label>
+                </ion-chip>
+
+                <ion-chip outline color="danger" *ngFor="let property of atype.properties.desired">
+                  <ion-label>{{ 'props.' + property | translate }}</ion-label>
+                  <ion-icon name="add-circle-outline" (click)="addPermision(atype.activity, property)"></ion-icon>
+                </ion-chip>
+
+                <ion-chip outline color="medium" *ngFor="let property of atype.properties.optional">
+                  <ion-label>{{ 'props.' + property | translate }}</ion-label>
+                </ion-chip>
+              </ion-card-content>
+            </ion-card>
+          </ng-container>
+
+
+        </ion-col>
+
+      </ng-container>
+
+
+    </ion-row>
+  </ion-grid>
+</ion-content>

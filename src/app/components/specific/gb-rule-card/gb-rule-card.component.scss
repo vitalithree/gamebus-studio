@@ -1,0 +1,127 @@
+.task-info-bar {
+    display: flex;
+    align-items: center;
+    margin-top: 8px;
+
+    ion-button {
+        margin-left: 8px;
+        --padding-start: 6px;
+        --padding-end: 6px;
+    }
+}
+
+ion-chip {
+    margin-top: 0;
+}
+
+meter {
+    position: relative;
+    appearance: none;
+    background: #e9eaec;
+    border: none;
+    border-radius: 6px;
+    display: block;
+    width: 100%;
+    height: 6px;
+
+    &::-webkit-meter-inner-element {
+        display: block;
+    }
+
+    &::-webkit-meter-bar,
+    &::-webkit-meter-optimum-value,
+    &::-webkit-meter-suboptimum-value,
+    &::-webkit-meter-even-less-good-value {
+        border-radius: 3px;
+    }
+
+    &::-webkit-meter-bar {
+        background: #e9eaec;
+        border: none;
+    }
+
+    &::-webkit-meter-optimum-value {
+        background: var(--ion-color-success);
+        min-width: 8px;
+    }
+
+    &::-webkit-meter-suboptimum-value,
+    &::-webkit-meter-even-less-good-value {
+        background: var(--ion-color-danger);
+        min-width: 8px;
+    }
+
+    &::-moz-meter-bar,
+    &:-moz-meter-optimum,
+    &:-moz-meter-sub-optimum,
+    &:-moz-meter-sub-sub-optimum {
+        border-radius: 3px;
+    }
+
+    &:-moz-meter-optimum::-moz-meter-bar {
+        background: var(--ion-color-success);
+        min-width: 8px;
+    }
+
+    &:-moz-meter-sub-optimum::-moz-meter-bar,
+    &:-moz-meter-sub-sub-optimum::-moz-meter-bar {
+        background: var(--ion-color-danger);
+        min-width: 8px;
+    }
+
+}
+
+.image {
+    position: relative;
+    height: 256px;
+    overflow: hidden;
+    background-color: var(--ion-color-light-tint);
+
+    >ion-img {
+        position: absolute;
+        top: 0;
+        right: 0;
+        bottom: 0;
+        left: 0;
+        object-fit: cover;
+    }
+
+    &.loading {
+        &:before {
+            content: '';
+            position: absolute;
+            top: 0;
+            right: 0;
+            bottom: 0;
+            left: 0;
+            background-color: var(--ion-color-light);
+        }
+
+        &:after {
+            content: '';
+            position: absolute;
+            top: 50%;
+            left: 50%;
+            margin-top: -10px;
+            margin-left: -10px;
+            width: 20px;
+            height: 20px;
+            border-style: solid;
+            border-color: var(--ion-color-medium);
+            border-top-color: transparent;
+            border-width: 3px;
+            border-radius: 50%;
+            animation: spin .8s linear infinite;
+        }
+
+        @keyframes spin {
+            from {
+                transform: rotate(0deg);
+            }
+
+            to {
+                transform: rotate(360deg);
+            }
+        }
+    }
+}

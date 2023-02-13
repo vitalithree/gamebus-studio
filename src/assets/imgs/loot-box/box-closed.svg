@@ -1,0 +1,13 @@
+<?xml version="1.0" encoding="UTF-8"?>
+<svg width="400px" height="400px" viewBox="0 0 400 400" version="1.1" xmlns="http://www.w3.org/2000/svg" xmlns:xlink="http://www.w3.org/1999/xlink">
+    <title>box-closed</title>
+    <g id="box-closed" stroke="none" stroke-width="1" fill="none" fill-rule="evenodd">
+        <g transform="translate(8.000000, 4.000000)" fill-rule="nonzero" id="Path">
+            <polygon fill="#D9AC80" points="192.4 0 288 49.2 384 98 288 147.2 192.4 196.4 96.8 147.2 0.8 98 96.8 49.2"></polygon>
+            <polygon fill="#D7BAA4" points="312 179.6 312 135.2 264 159.6 264 204 290.4 171.6"></polygon>
+            <polygon fill="#A67E4F" points="192.4 196.4 192.4 392.8 384 294.8 384 98 312 135.2 310.4 136 310.4 179.2 290.4 171.6 264 204 264 159.6"></polygon>
+            <polygon fill="#926E43" points="192.4 392.8 192.4 196.4 96.8 147.2 0.8 98 0.8 294.8"></polygon>
+            <polygon fill="#F2D3BA" points="72.8 61.2 264 159.6 310.4 136 312 135.2 120.8 36.8 96.8 49.2"></polygon>
+        </g>
+    </g>
+</svg>

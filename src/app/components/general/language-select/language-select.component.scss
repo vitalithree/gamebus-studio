@@ -1,0 +1,33 @@
+ion-avatar {
+    height: 24px;
+    width: 24px;
+    margin-right: 8px;
+}
+
+ion-button {
+    p span {
+        float: left;
+        font-size: .6rem;
+        letter-spacing: normal;
+    }
+
+    &[color="light"] {
+        p {
+            color: #fff;
+
+            span {
+                color: var(--ion-color-light-shade);
+            }
+        }
+    }
+
+    &[color="medium"] {
+        p {
+            color: var(--ion-color-medium-shade);
+
+            span {
+                color: var(--ion-color-medium-tint);
+            }
+        }
+    }
+}

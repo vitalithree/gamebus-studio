@@ -1,0 +1,60 @@
+<app-header [title]="page?.tk | translate"></app-header>
+
+<ion-content>
+
+  <ion-refresher slot="fixed" (ionRefresh)="parseData(true, $event)">
+    <ion-refresher-content></ion-refresher-content>
+  </ion-refresher>
+
+  <ion-grid class="ion-no-padding">
+    <ion-row style="justify-content: center;">
+      <ion-col size="12" size-md="7" class="ion-no-padding">
+
+        <ng-template #loading>
+          <ion-spinner></ion-spinner>
+        </ng-template>
+
+        <ng-container *ngIf="isReady; else loading">
+          <ng-container *ngIf="challenges?.length; else empty;">
+
+            <ng-container *ngFor="let challenge of challenges">
+              <app-progress-card [challenge]="challenge" [settings]="settings"></app-progress-card>
+            </ng-container>
+
+          </ng-container>
+
+
+          <ng-template #empty>
+            <ion-row style="justify-content: center;">
+              <ion-col size="12" size-md="7">
+                <div class="empty-state">
+
+                  <img [src]="uris.assets + '/empty-states/no-challenges.svg'">
+
+                  <ion-text>
+                    <h3>{{ "p.s.progress.empty-1" | translate }}</h3>
+                    <p>{{ "p.s.progress.empty-2" | translate }}</p>
+                  </ion-text>
+                </div>
+              </ion-col>
+            </ion-row>
+          </ng-template>
+
+        </ng-container>
+
+
+      </ion-col>
+    </ion-row>
+  </ion-grid>
+
+
+  <ion-fab *ngIf="isReady && challenges?.length" vertical="top" horizontal="end" slot="fixed" edge>
+    <ion-chip [ngClass]="{ fade: view.fab }">
+      <ion-label>{{ "p.s.progress.earn-points" | translate }}</ion-label>
+    </ion-chip>
+    <ion-fab-button color="secondary" routerLink="/tasks" routerDirection="forward">
+      <ion-icon name="add"></ion-icon>
+    </ion-fab-button>
+  </ion-fab>
+
+</ion-content>

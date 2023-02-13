@@ -1,0 +1,7 @@
+<ion-button fill="clear" [color]="color" [disabled]="isLocked || !languages || languages.length < 2"
+  (click)="presentLanguageOptions($event)">
+  <ion-avatar>
+    <img [src]="uris.assets + '/languages/' + language + '.svg'">
+  </ion-avatar>
+  <p><span>{{ 'c.g.language-select.language' | translate }}</span><br>{{ 'c.g.language-select.' + language | translate }}</p>
+</ion-button>

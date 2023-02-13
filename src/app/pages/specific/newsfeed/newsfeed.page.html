@@ -1,0 +1,48 @@
+<app-header [title]="page?.tk | translate"></app-header>
+
+<ion-content>
+
+  <ion-refresher *ngIf="isReady" slot="fixed" (ionRefresh)="parseData($event)">
+    <ion-refresher-content></ion-refresher-content>
+  </ion-refresher>
+
+  <ion-grid class="ion-no-padding">
+
+    <ion-row style="justify-content: center;">
+      <ion-col size="12" size-md="7" class="ion-no-padding">
+
+        <ng-template #loading>
+          <ion-spinner></ion-spinner>
+        </ng-template>
+
+        <ng-container *ngIf="isReady; else loading">
+          <ng-container *ngIf="state.newsfeed?.items?.length; else empty">
+
+            <ng-container *ngFor="let activity of state.newsfeed.items; let i = index;">
+              <app-activity-card [activity]="activity"></app-activity-card>
+            </ng-container>
+
+          </ng-container>
+        </ng-container>
+
+        <ng-template #empty>
+          <div class="empty-state">
+            <img [src]="uris.assets + '/empty-states/no-news.svg'">
+            <ion-text>
+              <h3>{{ 'p.s.newsfeed.empty-1' | translate}}</h3>
+              <p>{{ "p.s.leaderboard.empty-2" | translate }}</p>
+            </ion-text>
+          </div>
+
+        </ng-template>
+
+      </ion-col>
+    </ion-row>
+
+  </ion-grid>
+
+  <ion-infinite-scroll *ngIf="isReady" (ionInfinite)="parseData($event)">
+    <ion-infinite-scroll-content></ion-infinite-scroll-content>
+  </ion-infinite-scroll>
+
+</ion-content>

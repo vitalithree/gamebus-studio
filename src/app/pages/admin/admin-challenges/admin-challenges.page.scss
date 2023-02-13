@@ -1,0 +1,17 @@
+ion-card {
+    background-color: #fff;
+
+    ion-card-header {
+        padding-bottom: 0;
+
+        ion-card-title {
+            font-style: italic;
+            display: flex;
+        }
+        ion-icon {
+            margin-left: auto;
+            justify-self: flex-end;
+            cursor: pointer;
+        }
+    }
+}

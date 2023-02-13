@@ -1,0 +1,291 @@
+<app-header [title]="!isReady ? null : ('Challenge ' + xid)" backbutton="/admin/dashboards/challenges">
+</app-header>
+<ion-toolbar color="primary" mode="md">
+  <ion-segment [value]="view.segment" (ionChange)="view.segment = $event.detail.value" scrollable>
+    <ion-segment-button value="rules">
+      <ion-icon name="game-controller-outline"></ion-icon>
+    </ion-segment-button>
+    <ion-segment-button value="leaderboard">
+      <ion-icon name="podium-outline"></ion-icon>
+    </ion-segment-button>
+    <ion-segment-button value="rewards">
+      <ion-icon name="trophy-outline"></ion-icon>
+    </ion-segment-button>
+  </ion-segment>
+</ion-toolbar>
+<ion-content>
+  <ion-refresher slot="fixed" (ionRefresh)="parseData($event)">
+    <ion-refresher-content></ion-refresher-content>
+  </ion-refresher>
+
+  <ion-grid class="ion-no-padding">
+    <ion-row style="justify-content: center;">
+      <ion-col size="12" size-md="7" class="ion-no-padding">
+
+        <ng-template #loading>
+          <ion-spinner></ion-spinner>
+        </ng-template>
+
+
+
+        <ng-container *ngIf="isReady; else loading">
+
+          <ng-container *ngIf="challenge; else empty;">
+
+
+            <ng-container [ngSwitch]="view.segment">
+              <ng-container *ngSwitchCase="'leaderboard'">
+
+                <ion-card mode="md">
+                  <form [formGroup]="sform">
+                    <ion-list lines="full">
+                      <div style="display: flex;">
+                        <ion-item style="width: 50%; margin-right: 2px;">
+                          <ion-label>Show individuals</ion-label>
+                          <ion-checkbox formControlName="individuals" slot="start" style="margin-right: 8px;"
+                            (ionChange)="updateSettings()"></ion-checkbox>
+                        </ion-item>
+                        <ion-item style="width: 50%; margin-left: 2px;">
+                          <ion-label>Show groups</ion-label>
+                          <ion-checkbox formControlName="groups" slot="start" style="margin-right: 8px;"
+                            (ionChange)="updateSettings()"></ion-checkbox>
+                        </ion-item>
+                      </div>
+                    </ion-list>
+                  </form>
+
+                  <ion-card-header>
+                    <ion-card-title style="padding-bottom: 16px;">
+                      Members
+                      <ion-icon name="add-circle-outline" size="large" color="medium" (click)="view.add = !view.add">
+                      </ion-icon>
+                    </ion-card-title>
+
+                  </ion-card-header>
+
+                  <ng-container *ngIf="view.add">
+                    <ion-card-content>
+                      <ion-segment [(ngModel)]="view.circles" [ngModelOptions]="{standalone: true}" mode="ios">
+                        <ion-segment-button value="individuals">
+                          <ion-label>Individuals</ion-label>
+                        </ion-segment-button>
+                        <ion-segment-button value="teams">
+                          <ion-label>Teams</ion-label>
+                        </ion-segment-button>
+                        <ion-segment-button value="individualsOfTeams">
+                          <ion-label>Individuals of Teams</ion-label>
+                        </ion-segment-button>
+                      </ion-segment>
+                    </ion-card-content>
+                    <ion-card-content>
+                      <ion-button expand="block" color="secondary" mode="md" (click)="addParticipants()">
+                        Add participants
+                      </ion-button>
+                    </ion-card-content>
+                    <ion-list *ngIf="view.circles === 'individuals'">
+                      <ion-item *ngFor="let individual of circles.individuals">
+                        <ion-avatar slot="start" [routerLink]="['/activities/', individual.pid]">
+                          <img [src]="individual.image"
+                            (error)="$event.target.src = uris.assets + '/placeholders/ph-fa-' + (individual.pid % 10) + '.svg'">
+                        </ion-avatar>
+                        <ion-label>
+                          {{ individual.firstname + ' ' + individual.lastname }}
+                        </ion-label>
+                        <ion-icon *ngIf="individual.inTeam" name="checkbox-outline" color="secondary"
+                          style="margin-right: 8px;"></ion-icon>
+                        <ion-checkbox [(ngModel)]="individual.selected" [disabled]="individual.disabled">
+                        </ion-checkbox>
+                      </ion-item>
+                    </ion-list>
+
+                    <ion-list *ngIf="view.circles === 'teams'">
+                      <ion-item *ngFor="let team of circles.teams">
+                        <ion-avatar slot="start">
+                          <img [src]="team.image"
+                            (error)="$event.target.src = uris.assets + '/placeholders/ph-group.svg'">
+                        </ion-avatar>
+                        <ion-label>
+                          {{ team.name }}
+                          <p>{{ team.size }} members</p>
+                        </ion-label>
+                        <ion-checkbox [(ngModel)]="team.selected" [disabled]="team.disabled"></ion-checkbox>
+                      </ion-item>
+                    </ion-list>
+
+                    <ion-list *ngIf="view.circles === 'individualsOfTeams'">
+                      <ion-item *ngFor="let team of circles.individualsOfTeams">
+                        <!-- detail (click)="selectIndividualsOfTeams([team.cid])" -->
+                        <ion-avatar slot="start">
+                          <img [src]="team.image"
+                            (error)="$event.target.src = uris.assets + '/placeholders/ph-group.svg'">
+                        </ion-avatar>
+                        <ion-label>
+                          {{ team.name }}
+                          <p>{{ team.size }} members</p>
+                        </ion-label>
+                        <ion-checkbox [(ngModel)]="team.selected" (ionChange)="selectIndividualsOfTeams()"></ion-checkbox>
+                      </ion-item>
+                    </ion-list>
+                  </ng-container>
+                </ion-card>
+
+                <app-leaderboard [challenge]="challenge" [settings]="settings"></app-leaderboard>
+              </ng-container>
+
+
+
+              <ng-container *ngSwitchCase="'rules'">
+                <ion-card mode="md">
+
+                  <form [formGroup]="cuform">
+                    <ion-card-header>
+                      <ion-card-title>
+                        General information
+                      </ion-card-title>
+                    </ion-card-header>
+                    <ion-list>
+                      <ion-item>
+                        <ion-label>xid</ion-label>
+                        <ion-chip slot="end" color="dark">
+                          <ion-label>{{ challenge.id }}</ion-label>
+                        </ion-chip>
+                      </ion-item>
+
+                      <ion-accordion-group>
+                        <ion-accordion value="name">
+                          <ion-item lines="inset" slot="header">
+                            <ion-label>Name</ion-label>
+                            <ion-chip slot="end" color="dark">
+                              <ion-label>{{ challenge.name }}</ion-label>
+                            </ion-chip>
+                          </ion-item>
+
+                          <ion-list slot="content">
+                            <ion-item lines="inset">
+                              <ion-input formControlName="name" color="medium"></ion-input>
+                              <ion-button slot="end" shape="round" fill="clear" color="secondary"
+                                style="margin-left: 8px;" (click)="updateChallenge()" [disabled]="isLocked">
+                                <ion-icon slot="icon-only" name="send-outline"></ion-icon>
+                              </ion-button>
+                            </ion-item>
+                          </ion-list>
+                        </ion-accordion>
+                      </ion-accordion-group>
+
+                      <ion-item>
+                        <ion-label>Creator</ion-label>
+                        <ion-chip slot="end" color="dark" *ngIf="challenge.creator; let user">
+                          <ion-avatar>
+                            <img [src]="user.image"
+                              (error)="$event.target.src = uris.assets + '/placeholders/ph-fa-' + (user.player.id % 10) + '.svg'">
+                          </ion-avatar>
+                          <ion-label>{{ user.firstName + ' ' + user.lastName }} (uid: {{ user.id }})</ion-label>
+                        </ion-chip>
+                      </ion-item>
+
+                      <ion-item>
+                        <ion-label>Date available</ion-label>
+                        <ion-chip slot="end" color="dark">
+                          <ion-icon name="calendar-outline"></ion-icon>
+                          <ion-label>{{ challenge.availableDate | momentDateFormat }}</ion-label>
+                        </ion-chip>
+                      </ion-item>
+                      <ion-item>
+                        <ion-label>Start date</ion-label>
+                        <ion-chip slot="end" color="dark">
+                          <ion-icon name="calendar-outline"></ion-icon>
+                          <ion-label>{{ challenge.startDate | momentDateFormat }}</ion-label>
+                        </ion-chip>
+                      </ion-item>
+                      <ion-item>
+                        <ion-label>End date</ion-label>
+                        <ion-chip slot="end" color="dark">
+                          <ion-icon name="calendar-outline"></ion-icon>
+                          <ion-label>{{ challenge.endDate | momentDateFormat }}</ion-label>
+                        </ion-chip>
+                      </ion-item>
+
+                      <ion-item>
+                        <ion-label>Duration</ion-label>
+                        <ion-chip slot="end" color="dark">
+                          <ion-icon name="time-outline"></ion-icon>
+                          <ion-label>{{ challenge.duration }} days</ion-label>
+                        </ion-chip>
+                      </ion-item>
+
+                      <ion-item>
+                        <ion-label>Circle size</ion-label>
+                        <ion-chip slot="end" color="dark">
+                          <ion-label>{{ challenge.minCircleSize === challenge.maxCircleSize ? challenge.maxCircleSize :
+                            challenge.minCircleSize + '-' + challenge.maxCircleSize }} users</ion-label>
+                        </ion-chip>
+                      </ion-item>
+
+                      <ion-item>
+                        <ion-label>Participants</ion-label>
+                        <ion-chip slot="end" color="dark">
+                          <ion-label>{{ challenge.participations?.length || 0 }} users</ion-label>
+                        </ion-chip>
+                      </ion-item>
+
+                      <ion-item>
+                        <ion-label>Target</ion-label>
+                        <ion-chip slot="end" color="dark">
+                          <ion-label>{{ challenge.target ? challenge.target : 0 }} points</ion-label>
+                        </ion-chip>
+                      </ion-item>
+
+                      <ion-item>
+                        <ion-label>Contenders</ion-label>
+                        <ion-chip slot="end" color="dark">
+                          <ion-label>{{ challenge.contenders ? challenge.contenders : 'All' }} users</ion-label>
+                        </ion-chip>
+                      </ion-item>
+
+                    </ion-list>
+                  </form>
+                </ion-card>
+
+                <ion-card mode="md">
+                  <ion-card-header>
+                    <ion-card-title>
+                      Rules
+                    </ion-card-title>
+                  </ion-card-header>
+                  <ion-list>
+                    <app-rule-list-item *ngFor="let rule of challenge.challengeRules" [rule]="rule" [routerLink]="['/tasks', rule.id]">
+                    </app-rule-list-item>
+
+                  </ion-list>
+                </ion-card>
+              </ng-container>
+
+              <ng-container *ngSwitchCase="'rewards'">
+                <app-lotteries-card *ngIf="challenge.lottery?.length" [challenge]="challenge"></app-lotteries-card>
+
+                <app-winners-card *ngIf="challenge.rewardConfig?.length" [challenge]="challenge"></app-winners-card>
+
+              </ng-container>
+
+            </ng-container>
+
+          </ng-container>
+
+          <ng-template #empty>
+            <ion-card mode="md">
+              <ion-card-content class="ion-text-center">
+                <ion-text color="medium">
+                  <h3 style="font-size: 1.4rem; font-weight: bold;">Challenge not available...</h3>
+                  <p>This challenge does not seem to exist!</p>
+                </ion-text>
+              </ion-card-content>
+            </ion-card>
+          </ng-template>
+        </ng-container>
+
+      </ion-col>
+    </ion-row>
+  </ion-grid>
+
+
+</ion-content>

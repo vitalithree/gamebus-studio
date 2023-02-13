@@ -1,0 +1,11 @@
+<ion-list lines="full">
+  <ion-item *ngFor="let language of languages" (click)="setLanguage(language)">
+    <ion-avatar slot="start">
+      <img [src]="uris.assets + '/languages/' + language + '.svg'">
+    </ion-avatar>
+    <ion-label>
+      {{ 'c.g.language-select.' + language | translate }}
+    </ion-label>
+  </ion-item>
+
+</ion-list>

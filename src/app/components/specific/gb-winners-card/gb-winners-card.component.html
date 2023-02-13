@@ -1,0 +1,112 @@
+<ng-template #loading>
+  <ion-row style="justify-content: center;">
+    <ion-spinner></ion-spinner>
+  </ion-row>
+</ng-template>
+
+
+<ng-container *ngIf="isReady; else loading;">
+
+  <ng-container *ngIf="rewards?.length">
+    <ion-card mode="md">
+      <ion-card-header>
+        <ion-card-title>{{ "c.s.winners-card.rewards" | translate }}</ion-card-title>
+      </ion-card-header>
+
+      <!-- <ion-card-content style="padding-bottom: 0;" *ngIf="challenge.contenders || challenge.target">
+        <em>
+          {{ "c.s.winners-card.rewards-are-raffled-among" | translate }}
+          <span *ngIf="challenge.contenders && challenge.target">
+            {{ "c.s.winners-card.contenders-target" | translate:{ contenders: challenge.contenders, target:
+            challenge.target } }}
+          </span>
+          <span *ngIf="challenge.contenders && !challenge.target">
+            {{ "c.s.winners-card.contenders-no-target" | translate:{ contenders: challenge.contenders } }}
+          </span>
+          <span *ngIf="!challenge.contenders && challenge.target">
+            {{ "c.s.winners-card.no-contenders-target" | translate:{ target: challenge.target } }}
+          </span>
+        </em>
+      </ion-card-content> -->
+
+      <ion-list>
+        <ng-container *ngFor="let reward of rewards">
+          <ion-item lines="full" (click)="updateView(reward.id)">
+            <ion-avatar slot="start" *ngIf="reward.image">
+              <img [src]="reward.image" (error)="$event.target.style.display = 'none'">
+            </ion-avatar>
+            <ion-label class="ion-text-wrap">
+              {{ reward.amount }} &times; {{ reward.name }}
+              <p *ngIf="reward.amount !== reward.stillLeft">
+                {{ reward.stillLeft }} {{ "rewards.stillLeft" | translate }}
+              </p>
+              <ion-text color="dark" [innerHtml]="reward.description | mdToHtml"></ion-text>
+            </ion-label>
+
+            <ion-icon *ngIf="!view.includes(reward.id)" slot="end" size="small" name="caret-down"></ion-icon>
+            <ion-icon *ngIf="view.includes(reward.id)" slot="end" size="small" name="caret-up"></ion-icon>
+          </ion-item>
+
+          <ion-item-group *ngIf="view.includes(reward.id)">
+
+            <ion-item-divider [id]="'open-new-winners-modal-' + reward.id">
+              <ion-label>{{ "c.s.winners-card.winners" | translate }}</ion-label>
+              <ion-icon *ngIf="isOrganizer" slot="end" name="add-circle-outline"></ion-icon>
+            </ion-item-divider>
+
+            <ion-popover *ngIf="isOrganizer" [trigger]="'open-new-winners-modal-' + reward.id" side="end">
+              <ng-template>
+                <ion-list>
+                  <ion-item *ngFor="let participation of challenge.participations">
+                    <ion-checkbox slot="start" [(ngModel)]="participation.checked"></ion-checkbox>
+                    <ion-label class="ion-text-wrap">{{ participation.circle.name }}</ion-label>
+                  </ion-item>
+
+                  <ion-item>
+                    <ion-button (click)="createRewards(reward.name)" expand="block" size="small">
+                      {{ "c.s.winners-card.create-rewards" | translate }}
+                    </ion-button>
+                  </ion-item>
+
+                </ion-list>
+              </ng-template>
+            </ion-popover>
+
+            <ng-container *ngIf="reward.instances?.length; else nowinner">
+
+              <ion-item-sliding *ngFor="let instance of reward.instances">
+                <ion-item>
+                  <ion-avatar slot="start">
+                    <img [src]="instance.user.image"
+                      (error)="$event.target.src = uris.assets + '/placeholders/ph-fa-' + (instance.user.pid % 10) + '.svg'">
+                  </ion-avatar>
+                  <ion-label class="ion-text-wrap">
+                    {{ instance.user.firstname + ' ' + instance.user.lastname }}
+                    <p *ngIf="instance.user.self">{{ "c.s.winners-card.well-done" | translate }}</p>
+                  </ion-label>
+                </ion-item>
+
+                <ion-item-options *ngIf="isOrganizer" side="end">
+                  <ion-item-option (click)="removeReward(instance.id, $event)" color="danger">
+                    {{ "c.s.winners-card.remove-reward" | translate }}
+                  </ion-item-option>
+                </ion-item-options>
+              </ion-item-sliding>
+
+            </ng-container>
+
+            <ng-template #nowinner>
+              <ion-item>
+                <ion-label>
+                  <p>{{ "c.s.winners-card.no-winners-yet" | translate }}</p>
+                </ion-label>
+              </ion-item>
+            </ng-template>
+          </ion-item-group>
+        </ng-container>
+
+      </ion-list>
+    </ion-card>
+  </ng-container>
+
+</ng-container>

@@ -1,0 +1,53 @@
+<ion-item [ngClass]="{'opaque': !isRewardedByThisApp()}" (click)="presentInformativeToast()">
+  <!-- [detail]="isRewardedByThisApp() && isStillRewarded() ? true : false" -->
+  <ion-avatar slot="start">
+    <img [src]="rule.image || rule.defaultGameDescriptor.image">
+  </ion-avatar>
+  <ion-label class="ion-text-wrap">
+    {{ rule.name }}
+    <p>
+      {{ 'c.s.rule-list-item.allowed-sources' | translate }}:
+      <ng-container *ngFor="let pm of rule.pointMappings">
+        <ng-container *ngIf="pm.playerRole.id === role">
+          <ng-container *ngFor="let dp of pm.dataProviders">
+            <ion-avatar>
+              <img [src]="dp.image">
+            </ion-avatar>
+          </ng-container>
+        </ng-container>
+      </ng-container>
+    </p>
+    <p *ngIf="rule.maxTimesFired > 0 && rule.minDaysBetweenFire > 0 && rule.maxTimesFired < 999999">
+      {{ 'c.s.rule-list-item.maximum' | translate }} {{ rule.maxTimesFired }}&times; {{ 'c.s.rule-list-item.per' | translate }}
+      {{ rule.minDaysBetweenFire === 1 ? ('c.s.rule-list-item.day' | translate) : rule.minDaysBetweenFire === 7 ? ('c.s.rule-list-item.week' | translate) :
+      rule.minDaysBetweenFire + ' ' + ('c.s.rule-list-item.days' | translate) }}
+    </p>
+    <meter
+      *ngIf="rule.maxTimesFired > 0 && rule.maxTimesFired < 999999 && rule.minDaysBetweenFire > 0 && isStillRewarded()"
+      class="meter" [value]="rule.numberOfFiresInTimeWindow" [min]="0" [low]="1" [high]="rule.maxTimesFired"
+      [optimum]="rule.maxTimesFired" [max]="rule.maxTimesFired"></meter>
+  </ion-label>
+  <ion-icon name="camera" *ngIf="rule.imageRequired"></ion-icon>
+  <ion-chip slot="end" *ngIf="isStillRewarded(); else TASK_DONE">
+    <ion-label>
+      <strong>
+        <ng-container *ngFor="let pm of rule.pointMappings">
+          <ng-container *ngIf="pm.playerRole.id === role">
+            <ng-container *ngIf="pm.points !== 0; else unknown_points">
+              <strong *ngIf="pm.points > 0">+</strong><strong>{{ pm.points }}</strong>
+            </ng-container>
+            <ng-template #unknown_points>
+              <strong>+?</strong>
+            </ng-template>
+          </ng-container>
+        </ng-container>
+      </strong>
+    </ion-label>
+  </ion-chip>
+
+  <ng-template #TASK_DONE>
+    <ion-chip slot="end" color="success" class="ion-no-padding">
+      <ion-icon mode="ios" name="checkmark" size="large"></ion-icon>
+    </ion-chip>
+  </ng-template>
+</ion-item>

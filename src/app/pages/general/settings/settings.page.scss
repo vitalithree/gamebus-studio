@@ -1,0 +1,11 @@
+ion-card {
+    background-color: #fff;
+}
+
+ion-item {
+    ion-button {
+        &[expand="block"] {
+            width: 100%;
+        }
+    }
+}

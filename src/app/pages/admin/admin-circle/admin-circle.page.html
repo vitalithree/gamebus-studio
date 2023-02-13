@@ -1,0 +1,192 @@
+<app-header [title]="!isReady ? null : ('Circle ' + cid)" backbutton="/admin/dashboards/groups">
+</app-header>
+<ion-content>
+  <ion-refresher slot="fixed" (ionRefresh)="parseData($event)">
+    <ion-refresher-content></ion-refresher-content>
+  </ion-refresher>
+
+  <ion-grid class="ion-no-padding">
+    <ion-row style="justify-content: center;">
+      <ion-col size="12" size-md="7" class="ion-no-padding">
+
+        <ng-template #loading>
+          <ion-spinner></ion-spinner>
+        </ng-template>
+
+        <ng-container *ngIf="isReady; else loading">
+
+          <ng-container *ngIf="circle; else empty">
+
+            <ion-card mode="md">
+
+              <form [formGroup]="cuform">
+                <ion-card-header>
+                  <ion-card-title>
+                    General information
+                  </ion-card-title>
+                </ion-card-header>
+                <ion-list>
+                  <ion-item>
+                    <ion-label>cid</ion-label>
+                    <ion-chip slot="end" color="dark">
+                      <ion-label>{{ circle.id }}</ion-label>
+                    </ion-chip>
+                  </ion-item>
+
+                  <ion-accordion-group>
+                    <ion-accordion value="name">
+                      <ion-item lines="inset" slot="header">
+                        <ion-label>Name</ion-label>
+                        <ion-chip slot="end" color="dark">
+                          <ion-label>{{ circle.name }}</ion-label>
+                        </ion-chip>
+                      </ion-item>
+
+                      <ion-list slot="content">
+                        <ion-item lines="inset">
+                          <ion-input formControlName="name" color="medium"></ion-input>
+                          <ion-button slot="end" shape="round" fill="clear" color="secondary" style="margin-left: 8px;"
+                            (click)="updateCircle()" [disabled]="isLocked">
+                            <ion-icon slot="icon-only" name="send-outline"></ion-icon>
+                          </ion-button>
+                        </ion-item>
+                      </ion-list>
+                    </ion-accordion>
+                  </ion-accordion-group>
+
+                  <ion-accordion-group>
+                    <ion-accordion value="name">
+                      <ion-item lines="inset" slot="header">
+                        <ion-label>Image</ion-label>
+                        <ion-chip slot="end" color="dark">
+                          <ion-avatar color="dark" style="margin: 0;">
+                            <img [src]="circle.image"
+                              (error)="$event.target.src = uris.assets + '/placeholders/ph-group.svg'">
+                          </ion-avatar>
+                        </ion-chip>
+                      </ion-item>
+
+                      <ion-list slot="content">
+                        <ion-item lines="inset">
+                          <ion-input formControlName="image" color="medium"></ion-input>
+                          <ion-button slot="end" shape="round" fill="clear" color="secondary" style="margin-left: 8px;"
+                            (click)="updateCircle()" [disabled]="isLocked">
+                            <ion-icon slot="icon-only" name="send-outline"></ion-icon>
+                          </ion-button>
+                        </ion-item>
+                      </ion-list>
+                    </ion-accordion>
+                  </ion-accordion-group>
+
+                  <ion-item>
+                    <ion-label>Circle size</ion-label>
+                    <ion-chip slot="end" color="dark">
+                      <ion-label>{{ circle.memberships?.length || 0 }} users</ion-label>
+                    </ion-chip>
+                  </ion-item>
+
+                </ion-list>
+              </form>
+            </ion-card>
+
+
+
+
+            <ion-card mode="md">
+              <ion-card-header>
+                <ion-card-title id="open-members-modal">
+                  Members
+                  <ion-icon name="add-circle-outline" size="large" color="medium"></ion-icon>
+                </ion-card-title>
+
+
+                <ion-modal #membermodal trigger="open-members-modal" side="end">
+                  <ng-template>
+                    <ion-content style="--padding-bottom: 0">
+                      <ion-list>
+                        <ion-list-header>
+                          <ion-label><strong>Add members</strong></ion-label>
+
+                          <ion-button (click)="this.addMembers(); membermodal.dismiss()" color="secondary">
+                            <ion-icon name="send-outline" slot="icon-only"></ion-icon>
+                          </ion-button>
+
+                          <ion-button (click)="membermodal.dismiss()" color="medium" style="--padding-start: 0;">
+                            <ion-icon name="close" slot="icon-only"></ion-icon>
+                          </ion-button>
+                        </ion-list-header>
+
+                        <ion-item *ngFor="let nm of nms">
+                          <ion-avatar slot="start">
+                            <img [src]="nm.image"
+                              (error)="$event.target.src = uris.assets + '/placeholders/ph-fa-' + (nm.pid % 10) + '.svg'">
+                          </ion-avatar>
+                          <ion-label class="ion-text-wrap">{{ nm.firstname }} {{ nm.lastname }}</ion-label>
+                          <ion-checkbox slot="end" [(ngModel)]="nm.selected"></ion-checkbox>
+                        </ion-item>
+
+                      </ion-list>
+
+
+                    </ion-content>
+
+                  </ng-template>
+                </ion-modal>
+
+              </ion-card-header>
+
+
+
+              <ion-list>
+                <ng-container *ngFor="let member of circle.memberships">
+
+                  <ion-item-sliding class="circle-item">
+                    <ion-item>
+                      <ion-avatar slot="start">
+                        <img [src]="member.player.user.image"
+                          (error)="$event.target.src = uris.assets + '/placeholders/ph-fa-' + (member.player.id % 10) + '.svg'">
+                      </ion-avatar>
+                      <ion-label class="ion-text-wrap">
+                        {{ member.player.user.firstName }} {{ member.player.user.lastName }}
+                        <p>
+                          mid = {{ member.id || 'null' }}
+                        </p>
+                      </ion-label>
+
+                    </ion-item>
+
+                    <ion-item-options side="end">
+                      <ion-item-option color="danger"
+                        (click)="updateMembership('remove', [member.player.id], member.id, cid, $event)"
+                        [disabled]="isLocked">
+                        Remove membership
+                      </ion-item-option>
+                    </ion-item-options>
+                  </ion-item-sliding>
+
+                </ng-container>
+              </ion-list>
+
+            </ion-card>
+
+
+          </ng-container>
+
+          <ng-template #empty>
+            <ion-card mode="md">
+              <ion-card-content class="ion-text-center">
+                <ion-text color="medium">
+                  <h3 style="font-size: 1.4rem; font-weight: bold;">Circle not available...</h3>
+                  <p>This circle does not seem to exist!</p>
+                </ion-text>
+              </ion-card-content>
+            </ion-card>
+          </ng-template>
+        </ng-container>
+
+      </ion-col>
+    </ion-row>
+  </ion-grid>
+
+
+</ion-content>

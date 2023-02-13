@@ -1,0 +1,84 @@
+ion-item {
+    &.opaque {
+        // opacity: .6;
+        --background: repeating-linear-gradient(
+            -45deg,
+            #fafafa,
+            #fafafa 5px,
+            transparent 5px,
+            transparent 10px
+          );
+    }
+    p {
+        display: flex;
+        align-items: center;
+        white-space: nowrap;
+
+        ion-avatar {
+            margin-left: 4px;
+            height: 14px;
+            width: 14px;
+        }
+    }
+    ion-chip {
+        ion-icon {
+            margin: 0 4px;
+        }
+    }
+}
+
+
+meter {
+    position: relative;
+    appearance: none;
+    background: #e9eaec;
+    border: 0;
+    border-radius: 6px;
+    display: block;
+    width: 100%;
+    height: 6px;
+
+    &::-webkit-meter-inner-element {
+        display: block;
+    }
+
+    &::-webkit-meter-bar,
+    &::-webkit-meter-optimum-value,
+    &::-webkit-meter-suboptimum-value,
+    &::-webkit-meter-even-less-good-value {
+        border-radius: 3px;
+    }
+
+    &::-webkit-meter-bar {
+        background: #e9eaec;
+    }
+
+    &::-webkit-meter-optimum-value {
+        background: var(--ion-color-primary);
+        min-width: 4px;
+    }
+
+    &::-webkit-meter-suboptimum-value,
+    &::-webkit-meter-even-less-good-value {
+        background: var(--ion-color-danger);
+        min-width: 4px;
+    }
+
+    &::-moz-meter-bar,
+    &:-moz-meter-optimum,
+    &:-moz-meter-sub-optimum,
+    &:-moz-meter-sub-sub-optimum {
+        border-radius: 3px;
+    }
+
+    &:-moz-meter-optimum::-moz-meter-bar {
+        background: var(--ion-color-primary);
+        min-width: 4px;
+    }
+
+    &:-moz-meter-sub-optimum::-moz-meter-bar,
+    &:-moz-meter-sub-sub-optimum::-moz-meter-bar {
+        background: var(--ion-color-danger);
+        min-width: 4px;
+    }
+}

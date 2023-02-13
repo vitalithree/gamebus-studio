@@ -1,0 +1,117 @@
+<app-header
+  [segments]="isReady ? [{name: ('p.g.activities.my-activities' | translate), route: '/account', direction: 'forward' },
+  {name: ('p.g.notifications.my-notifications' | translate), route: '/notifications', direction: 'forward', badge: state.alerts.unread.all }] : null">
+</app-header>
+
+<ion-content>
+
+  <ion-refresher *ngIf="isReady" slot="fixed" (ionRefresh)="getNotifications($event)">
+    <ion-refresher-content></ion-refresher-content>
+  </ion-refresher>
+
+  <ion-grid class="ion-no-padding">
+
+    <ion-row style="justify-content: center;">
+      <ion-col size="12" size-md="7" class="ion-no-padding">
+
+        <ng-template #loading>
+          <ion-spinner></ion-spinner>
+        </ng-template>
+
+        <ng-container *ngIf="isReady; else loading;">
+
+          <ion-card class="notification-panel full" mode="md" *ngIf="notifications.length > 0">
+            <ion-list>
+              <ion-list-header>
+                <ion-label class="ion-text-wrap">
+                  <strong style="font-size: 1.3rem;">{{ "p.g.notifications.my-notifications" | translate }}</strong>
+                </ion-label>
+              </ion-list-header>
+            </ion-list>
+
+            <ion-buttons>
+              <ion-button fill="clear" color="dark" (click)="markAllAsRead()">
+                <ion-icon slot="start" name="book"></ion-icon>
+                {{ "p.g.notifications.mark-all-as-read" | translate }}
+              </ion-button>
+            </ion-buttons>
+
+            <ion-list lines="full">
+              <ng-container *ngFor="let notification of notifications">
+
+                <ng-container *ngIf="notification.params; else direct_message;">
+
+                  <ion-item
+                    *ngIf="notification?.params?.message?.includes('fraud') && notification?.params?.message?.includes('fraudul'); else regular;"
+                    [ngClass]="{ 'isRead': notification.isRead }" class="isFraud" (click)="routeTo(notification)"
+                    detail>
+                    <ion-thumbnail slot="start" style="align-self: flex-start; margin-top: 17px;">
+                      <img src="./assets/imgs/fraud.svg">
+                    </ion-thumbnail>
+                    <ion-label class="ion-text-wrap">
+                      <p>{{ notification.date | momentFromNow }}</p>
+                      {{ "p.g.notifications.fraud" | translate }}
+                    </ion-label>
+                  </ion-item>
+
+                  <ng-template #regular>
+                    <ion-item [ngClass]="{ 'isRead': notification.isRead }" (click)="routeTo(notification)" detail>
+                      <ion-thumbnail slot="start" style="align-self: flex-start; margin-top: 17px;">
+                        <img [src]="notification.params.avatar_image"
+                          (error)="$event.target.src = uris.assets + '/placeholders/ph-user.svg'">
+                      </ion-thumbnail>
+                      <ion-label class="ion-text-wrap">
+                        <p>{{ notification.date | momentFromNow }}</p>
+
+                        <span
+                          [innerHTML]="'p.g.notifications.' + notification.translationKey | translate:notification.params"></span>
+                        <!-- <pre>{{ notification.params | json }}</pre> -->
+                      </ion-label>
+                    </ion-item>
+                  </ng-template>
+
+                </ng-container>
+
+                <ng-template #direct_message>
+                  <ion-item class="directMessage" routerLink="/uitdagingen" detail>
+                    <ion-thumbnail slot="start">
+                      <img [src]="notification.image" (error)="$event.target.src = './assets/icons/logo.svg'">
+                    </ion-thumbnail>
+                    <ion-label class="ion-text-wrap">
+                      <p>{{ notification.date | momentFromNow }}</p>
+                      <span [innerHTML]="notification.text"></span>
+                    </ion-label>
+                  </ion-item>
+                </ng-template>
+
+              </ng-container>
+            </ion-list>
+
+          </ion-card>
+
+          <ng-container *ngIf="notifications.length === 0">
+
+            <div class="empty-state">
+              <img [src]="uris.assets + '/empty-states/no-news.svg'">
+              <ion-text>
+                <h3>{{ "p.g.notifications.empty-1" | translate }}</h3>
+                <p>{{ "p.g.notifications.empty-2" | translate }}</p>
+              </ion-text>
+              <ion-button mode="md" expand="block" fill="outline" color="secondary" routerDirection="root"
+                routerLink="/tasks">
+                {{ "p.g.notifications.empty-3" | translate }}
+              </ion-button>
+            </div>
+
+          </ng-container>
+        </ng-container>
+
+      </ion-col>
+    </ion-row>
+  </ion-grid>
+
+  <ion-infinite-scroll *ngIf="isReady" (ionInfinite)="getNotifications($event)">
+    <ion-infinite-scroll-content></ion-infinite-scroll-content>
+  </ion-infinite-scroll>
+
+</ion-content>

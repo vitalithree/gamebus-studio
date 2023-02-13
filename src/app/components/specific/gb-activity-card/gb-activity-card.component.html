@@ -1,0 +1,214 @@
+<ion-card *ngIf="activity" mode="md">
+  <ion-list lines="inset" class="activity-list">
+
+    <ion-item lines="none">
+      <ion-avatar slot="start">
+        <!-- [routerLink]="activity.player.id === pid ?  ['/account'] : ['/activities', activity.player.id]" -->
+        <img [src]="activity.player.user.image"
+          (error)="$event.target.src = activity.player.id === pid ? uris.assets + '/placeholders/ph-user.svg' : uris.assets + '/placeholders/ph-fa-' + (activity.player.id % 10) + '.svg'">
+      </ion-avatar>
+      <ion-label>
+        <p>{{ activity.date | momentFromNow }}</p>
+        {{ activity.player.user.firstName + ' ' + activity.player.user.lastName }}
+      </ion-label>
+      <ion-icon *ngIf="isAdmin || activity.player.id === pid" slot="end" color="medium" name="ellipsis-horizontal"
+        (click)="presentOptionsPopover($event)">
+      </ion-icon>
+    </ion-item>
+
+    <ion-item *ngIf="activity.creator.id !== activity.player.id" lines="none">
+      <ion-avatar slot="start">
+        <!-- [routerLink]="activity.creator.id === pid ?  ['/account'] : ['/activities/', activity.creator.id]" -->
+        <img [src]="activity.creator.user.image"
+          (error)="$event.target.src = uris.assets + '/placeholders/ph-fa-' + (activity.creator.id % 10) + '.svg'">
+      </ion-avatar>
+      <ion-label>
+        <p>{{ "c.s.activity-card.edited-by" | translate }}:</p>
+        {{ activity.creator.user.firstName + ' ' + activity.creator.user.lastName }}
+      </ion-label>
+    </ion-item>
+
+
+    <ion-item lines="full"
+      (click)="activity.personalPoints && activity.personalPoints.length > 0 ? view.challenges = !view.challenges : null">
+      <ng-container *ngIf="activity.personalPoints && activity.personalPoints.length > 0; else activity_type;">
+        <ion-thumbnail slot="start" *ngIf="activity.personalPoints[0].challengeRule.image; else activity_image">
+          <img [src]="activity.personalPoints[0].challengeRule.image"
+            (error)="$event.target.src = uris.assets + '/placeholders/ph-activity.jpg'">
+        </ion-thumbnail>
+        <ng-template #activity_image>
+          <ion-avatar slot="start" *ngIf="activity.gameDescriptor.image">
+            <img [src]="activity.gameDescriptor.image"
+              (error)="$event.target.src = uris.assets + '/placeholders/ph-activity.jpg'">
+          </ion-avatar>
+        </ng-template>
+        <ion-label class="ion-text-wrap">
+          <p>
+            <strong>{{ activity.personalPoints[0].challengeRule.name }}</strong>
+          </p>
+        </ion-label>
+      </ng-container>
+      <ng-template #activity_type>
+        <ion-avatar slot="start" *ngIf="activity.gameDescriptor.image">
+          <img [src]="activity.gameDescriptor.image"
+            (error)="$event.target.src = uris.assets + '/placeholders/ph-activity.jpg'">
+        </ion-avatar>
+        <ion-label>
+          <strong>{{ 'atypes.' + activity.gameDescriptor.translationKey | translate }}</strong>
+          <!-- <p>
+            <ion-avatar slot="start" *ngIf="activity.dataProvider.image">
+              <img [src]="activity.dataProvider.image" (error)="$event.target.parentElement.style.display = 'none'">
+            </ion-avatar>
+            {{ activity.dataProvider.name }}
+          </p> -->
+        </ion-label>
+      </ng-template>
+
+      <ion-chip *ngIf="points !== 0" slot="end">
+        <ion-icon *ngIf="[2,3,4,5,9,11].includes(activity.dataProvider.id)" name="watch-outline" size="small">
+        </ion-icon>
+        <ion-label><strong *ngIf="points > 0">+</strong><strong>{{ points }}</strong></ion-label>
+      </ion-chip>
+
+    </ion-item>
+
+    <ion-item-group *ngIf="view.challenges">
+      <ion-item *ngFor="let pp of activity.personalPoints" lines="none">
+        <!-- style="cursor: pointer;" [routerLink]="['/uitdagingen', pp.participation.challenge.id]" -->
+        <ion-avatar slot="start">
+          <img [src]="pp.participation.challenge.image" (error)="$event.target.parentElement.style.display = 'none'">
+        </ion-avatar>
+        <ion-label>
+          {{ pp.participation.challenge.name.includes(config.campaign.abbr) ? config.campaign.name :
+          pp.participation.challenge.name }}
+          <p>
+            {{ pp.challengeRule.name }}
+          </p>
+        </ion-label>
+        <ion-chip *ngIf="pp.value !== 0" slot="end">
+          <ion-label><strong *ngIf="pp.value > 0">+</strong><strong>{{ pp.value }}</strong></ion-label>
+        </ion-chip>
+      </ion-item>
+    </ion-item-group>
+
+
+    <div [id]="'open-activity-modal-' + activity.id" class="image loading" *ngIf="activity.image">
+      <ion-img [src]="activity.image + '?access_token=' + token" class="primary"
+        (ionImgDidLoad)="$event.target.parentElement.classList.remove('loading')"
+        (ionError)="$event.target.src = uris.assets + '/placeholders/ph-activity.jpg'">
+      </ion-img>
+
+
+      <ion-modal [trigger]="'open-activity-modal-' + activity.id">
+        <ng-template>
+          <ion-img [src]="activity.image + '?access_token=' + token"
+            (ionError)="$event.target.src = uris.assets + '/placeholders/ph-activity.jpg'"></ion-img>
+        </ng-template>
+      </ion-modal>
+
+    </div>
+
+    <plyr *ngIf="activity.video" plyrTitle="Recorded Video"
+      [plyrPlaysInline]="true" [plyrSources]="[{ src: activity.video, type: 'video/mp4' }]" [plyrOptions]="plyrOptions">
+    </plyr>
+
+    <ng-container *ngIf="properties.filtered && properties.filtered.length > 0">
+      <ion-item *ngIf="activity.isSurvey">
+        <ion-label class="ion-text-wrap">
+          <p><em>{{ 'c.s.activity-card.privacy' | translate }}</em></p>
+        </ion-label>
+      </ion-item>
+      <ng-container *ngFor="let property of properties.filtered">
+        <ion-item *ngIf="property.value">
+          <ion-label class="ion-text-wrap">
+            <p *ngIf="activity.isSurvey">
+              {{ 'survey.' + property.key | translate }}
+            </p>
+            <p *ngIf="!activity.isSurvey">
+              {{ 'props.' + property.key | translate }}
+            </p>
+            <span [innerHtml]="property.value | displayProperty:property.key"></span>
+          </ion-label>
+        </ion-item>
+      </ng-container>
+    </ng-container>
+
+
+
+  </ion-list>
+
+  <ion-item class="supports" lines="none" *ngIf="activity.supports && activity.supports.length > 0"
+    (click)="view.supports = !view.supports">
+    <ion-label>
+      <p>{{ activity.supports.length }} {{ 'c.s.activity-card.supports' | translate }}</p>
+      <span *ngFor="let support of activity.supports; let i = index;">
+        {{ support.supporter.user.firstName + ' ' + support.supporter.user.lastName }}<span
+          *ngIf="i + 1 !== activity.supports.length">,</span>
+      </span>
+    </ion-label>
+  </ion-item>
+
+  <ion-list *ngIf="view.supports" style="padding-top: 0; padding-bottom: 0; margin-bottom: 8px;">
+    <ion-item *ngFor="let support of activity.supports">
+      <!-- [routerLink]="support.supporter.id === pid ?  ['/account'] : ['/activities/', support.supporter.id]" -->
+      <ion-avatar slot="start">
+        <img [src]="support.supporter.user.image"
+          (error)="$event.target.src = uris.assets + '/placeholders/ph-user.svg'">
+      </ion-avatar>
+      <ion-label class="ion-text-wrap">
+        <p>{{ support.date | momentFromNow }}</p>
+        {{ support.supporter.user.firstName + ' ' + support.supporter.user.lastName }}
+      </ion-label>
+    </ion-item>
+  </ion-list>
+
+  <div class="social">
+    <ion-button expand="block" fill="clear" [color]="gaveSupport ? 'danger' : 'dark'" (click)="supportActivity()">
+      <ion-icon [name]="gaveSupport ? 'heart' : 'heart-outline'" slot="start"></ion-icon>
+      {{ 'c.s.activity-card.support' | translate }}
+    </ion-button>
+    <div></div>
+    <ion-button expand="block" fill="clear" color="dark" (click)="input.setFocus()">
+      <ion-icon name="chatbox-outline" color="medium" slot="start"></ion-icon>
+      {{ 'c.s.activity-card.comment' | translate }}
+    </ion-button>
+  </div>
+  <ion-list style="padding-top: 0; padding-bottom: 0;">
+    <form [formGroup]="messageForm" (ngSubmit)="postMessage()" (keyup.enter)="postMessage()">
+      <ion-item>
+        <ion-avatar slot="start" style="align-self: flex-start; margin-top: 8px;">
+          <img [src]="authuser.details.image" (error)="$event.target.src = uris.assets + '/placeholders/ph-user.svg'">
+        </ion-avatar>
+        <ion-textarea [placeholder]="'c.s.activity-card.write-comment' | translate" formControlName="text"
+          style="--padding-end: 44px;" (ionFocus)="view.reactions = true" rows="1" auto-grow="true" autocapitalize="on">
+        </ion-textarea>
+        <ion-button type="submit" shape="round" color="secondary" [disabled]="!messageForm.valid">
+          <ion-icon name="send"></ion-icon>
+        </ion-button>
+      </ion-item>
+    </form>
+    <ion-item-group>
+      <ng-container *ngFor="let chat of activity.chats; let i = index;">
+        <ng-container *ngIf="view.reactions || i < 2">
+          <ion-item *ngFor="let message of chat.messages">
+            <ion-avatar slot="start" style="margin-top: 12px; align-self: flex-start;">
+              <img [src]="message.user.image" (error)="$event.target.src = uris.assets + '/placeholders/ph-user.svg'">
+            </ion-avatar>
+            <ion-label class="ion-text-wrap">
+              <p>{{ message.user.firstName + ' ' + message.user.lastName }} &ndash; {{ message.date | momentFromNow }}
+              </p>
+              {{ message.text }}
+            </ion-label>
+          </ion-item>
+        </ng-container>
+      </ng-container>
+    </ion-item-group>
+    <ion-item lines="none" style="height: 30px; cursor: pointer;" *ngIf="activity.chats && activity.chats.length > 2"
+      (click)="view.reactions = !view.reactions">
+      <ion-icon class="more-reactions" [name]="!view.reactions ? 'arrow-down' : 'arrow-up'" size="small" color="medium">
+      </ion-icon>
+    </ion-item>
+  </ion-list>
+
+
+</ion-card>

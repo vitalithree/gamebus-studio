@@ -1,0 +1,716 @@
+<app-header [segments]="[
+{name: 'Users', route: '/admin/dashboards/users', direction: 'forward'},
+{name: 'Groups', route: '/admin/dashboards/groups', direction: 'forward'},
+{name: 'Tasks', route: '/admin/dashboards/tasks', direction: 'forward'},
+{name: 'Challenges', route: '/admin/dashboards/challenges', direction: 'forward'},
+]" backbutton="/admin/dashboards/challenges">
+  <ion-buttons custom-end-buttons slot="end">
+    <ion-button (click)="view.nonrequired = !view.nonrequired">
+      <ion-icon *ngIf="!view.nonrequired" name="eye-outline" slot="icon-only"></ion-icon>
+      <ion-icon *ngIf="view.nonrequired" name="eye-off-outline" slot="icon-only"></ion-icon>
+    </ion-button>
+  </ion-buttons>
+</app-header>
+
+<ion-content>
+
+  <!-- <ion-refresher slot="fixed" (ionRefresh)="parseData(true, $event)">
+    <ion-refresher-content></ion-refresher-content>
+  </ion-refresher> -->
+
+  <ion-grid class="ion-no-padding">
+    <ion-row style="justify-content: center;">
+      <ion-col size="12" size-md="9" class="ion-no-padding">
+
+        <ng-template #loading>
+          <ion-spinner></ion-spinner>
+        </ng-template>
+
+        <ng-container *ngIf="isReady; else loading">
+          <form [formGroup]="form">
+
+            <ion-card mode="md">
+              <ion-card-header>
+                <ion-card-title>General configuration</ion-card-title>
+              </ion-card-header>
+
+              <ion-list lines="full">
+                <ion-item *ngIf="view.nonrequired">
+                  <ion-avatar slot="end" *ngIf="form.get('image').value">
+                    <img [src]="form.get('image').value" (error)="$event.target.style.display = 'none'"
+                      (load)="$event.target.style.display = 'block'">
+                  </ion-avatar>
+                  <ion-label position="stacked">Image</ion-label>
+                  <ion-input type="text" formControlName="image"></ion-input>
+                </ion-item>
+
+                <!-- <ion-item *ngIf="view.nonrequired">
+                  <ion-label position="stacked">Description</ion-label>
+                  <ion-textarea formControlName="description" rows="1" auto-grow="true" autocapitalize="on">
+                  </ion-textarea>
+                </ion-item>
+                <ion-item *ngIf="view.nonrequired">
+                  <ion-label position="stacked">URL</ion-label>
+                  <ion-input type="text" formControlName="url"></ion-input>
+                </ion-item> -->
+
+                <ion-item *ngIf="view.nonrequired">
+                  <ion-label>
+                    <p>Is public?</p>
+                  </ion-label>
+                  <ion-toggle formControlName="ispublic"></ion-toggle>
+                </ion-item>
+
+                <ion-item>
+                  <ion-label>
+                    <p>Display in tasks?</p>
+                  </ion-label>
+                  <ion-select interface="popover" formControlName="fortasks">
+                    <ion-select-option value="false">False</ion-select-option>
+                    <ion-select-option value="tasks:enforced">True: Enforced</ion-select-option>
+                    <ion-select-option value="tasks:selected">True: Self-selected</ion-select-option>
+                  </ion-select>
+                </ion-item>
+
+                <ion-item>
+                  <ion-label>
+                    <p>Display in performance vizualizations?</p>
+                  </ion-label>
+                  <ion-select interface="popover" formControlName="forviz">
+                    <ion-select-option value="false">False</ion-select-option>
+                    <ion-select-option value="viz:general">True</ion-select-option>
+                  </ion-select>
+                </ion-item>
+
+                <ion-item>
+                  <ion-label>
+                    <p>Do not trigger score points animation (i.e., silent)?</p>
+                  </ion-label>
+                  <ion-select interface="popover" formControlName="issilent">
+                    <ion-select-option [value]="false">False</ion-select-option>
+                    <ion-select-option [value]="true">True</ion-select-option>
+                  </ion-select>
+                </ion-item>
+              </ion-list>
+
+
+              <ion-list lines="full">
+                <ion-item-divider>
+                  <ion-label>Dates</ion-label>
+                </ion-item-divider>
+
+                <ion-item>
+                  <ion-label>
+                    <p>Match wave?</p>
+                  </ion-label>
+                  <ion-select interface="popover" formControlName="wave" (ionChange)="matchWaveDates($event)">
+                    <ion-select-option value="false">False</ion-select-option>
+                    <ion-select-option *ngFor="let w of config.waves" [value]="w.id">Match wave {{ w.id }}
+                    </ion-select-option>
+                  </ion-select>
+                </ion-item>
+
+                <ion-item id="open-available-date-modal" *ngIf="view.nonrequired"
+                  [disabled]="form.get('available').disabled">
+                  <ion-label>
+                    <p>Available date</p>
+                  </ion-label>
+                  <ion-label slot="end">{{ form.get('available').value | momentDateFormat }}</ion-label>
+
+                  <ion-popover trigger="open-available-date-modal" side="end">
+                    <ng-template>
+                      <ion-datetime formControlName="available"></ion-datetime>
+                    </ng-template>
+                  </ion-popover>
+                </ion-item>
+
+                <ion-item id="open-start-date-modal" [disabled]="form.get('start').disabled">
+                  <ion-label>
+                    <p>Start date</p>
+                  </ion-label>
+                  <ion-label slot="end">{{ form.get('start').value | momentDateFormat }}</ion-label>
+
+                  <ion-popover trigger="open-start-date-modal" side="end">
+                    <ng-template>
+                      <ion-datetime formControlName="start"></ion-datetime>
+                    </ng-template>
+                  </ion-popover>
+                </ion-item>
+
+                <ion-item id="open-end-date-modal" [disabled]="form.get('end').disabled">
+                  <ion-label>
+                    <p>End date</p>
+                  </ion-label>
+                  <ion-label slot="end">{{ form.get('end').value | momentDateFormat }}</ion-label>
+
+                  <ion-popover trigger="open-end-date-modal" side="end">
+                    <ng-template>
+                      <ion-datetime formControlName="end"></ion-datetime>
+                    </ng-template>
+                  </ion-popover>
+                </ion-item>
+              </ion-list>
+
+
+              <ion-list lines="none" *ngIf="view.nonrequired">
+                <ion-item-divider>
+                  <ion-label>Circle sizes</ion-label>
+                </ion-item-divider>
+                <div style="display: flex; flex: 1;">
+                  <ion-item lines="inset" style="width: 50%;">
+                    <ion-label position="stacked">Minimum</ion-label>
+                    <ion-input type="number" formControlName="mincsize"></ion-input>
+                  </ion-item>
+                  <ion-item lines="inset" style="width: 50%;">
+                    <ion-label position="stacked">Maximum</ion-label>
+                    <ion-input type="number" formControlName="maxcsize"></ion-input>
+                  </ion-item>
+                </div>
+              </ion-list>
+
+              <ion-list lines="none" *ngIf="view.nonrequired">
+                <ion-item-divider>
+                  <ion-label>Goal</ion-label>
+                </ion-item-divider>
+                <div style="display: flex; flex: 1;">
+                  <ion-item lines="inset" style="width: 50%;">
+                    <ion-label position="stacked">Target</ion-label>
+                    <ion-input type="number" formControlName="target"></ion-input>
+                  </ion-item>
+                  <ion-item lines="inset" style="width: 50%;">
+                    <ion-label position="stacked">Contenders</ion-label>
+                    <ion-input type="number" formControlName="contenders"></ion-input>
+                  </ion-item>
+                </div>
+              </ion-list>
+            </ion-card>
+
+            <ion-card mode="md">
+              <ion-card-header>
+                <ion-card-title style="display: flex; justify-content: space-between;">
+                  Tasks ({{ form.get('tasks')['controls'].length }})
+                  <div>
+                    <ion-icon name="add" id="open-tasks-modal" color="primary"></ion-icon>
+                    <ion-icon name="trash-outline" (click)="resetChildForms('tasks')" color="danger"></ion-icon>
+                  </div>
+                </ion-card-title>
+
+                <ion-modal #tasksmodal trigger="open-tasks-modal" side="end">
+                  <ng-template>
+                    <ion-content style="--padding-bottom: 0">
+                      <ion-list>
+                        <ion-list-header>
+                          <ion-label><strong>Select tasks</strong></ion-label>
+                          <ion-button (click)="tasksmodal.dismiss()" color="medium">
+                            <ion-icon name="close" slot="icon-only"></ion-icon>
+                          </ion-button>
+                        </ion-list-header>
+                        <ion-item-divider>
+                          <ion-label>Common tasks</ion-label>
+                        </ion-item-divider>
+                        <ion-item button
+                          (click)="addChildForm('tasks', { name: 'Multilevel rule', types: ['scorePoints'], providers: ['gamebusSystem'], points: 0 }, false); tasksmodal.dismiss();">
+                          <ion-label>Multilevel rule</ion-label>
+                        </ion-item>
+                        <ion-item button (click)="addChildForm('tasks'); tasksmodal.dismiss();">
+                          <ion-label>General task</ion-label>
+                        </ion-item>
+                        <ion-item-divider *ngIf="tasks?.length">
+                          <ion-label>Predefined tasks</ion-label>
+                        </ion-item-divider>
+                        <ion-item button *ngFor="let task of tasks" (click)="addChildForm('tasks', task, false)">
+                          <ion-avatar slot="start">
+                            <img [src]="task.image"
+                              (error)="$event.target.src = uris.assets + '/placeholders/ph-challenge-tasks.svg'">
+                          </ion-avatar>
+                          <ion-label class="ion-text-wrap">{{ task.name }}</ion-label>
+                        </ion-item>
+                      </ion-list>
+                    </ion-content>
+                  </ng-template>
+                </ion-modal>
+
+              </ion-card-header>
+
+
+              <ion-list lines="full">
+
+                <ion-reorder-group (ionItemReorder)="reorderChildForms('tasks', $event)" disabled="false">
+
+                  <ng-container formArrayName="tasks">
+                    <ng-container *ngFor="let rule of form.get('tasks')['controls']; let t = index" [formGroupName]="t">
+
+                      <ion-item-sliding #item>
+                        <ion-item (click)="rule.get('isOpen').value = !rule.get('isOpen').value">
+                          <ion-avatar slot="start" *ngIf="rule.get('image').value">
+                            <img [src]="rule.get('image').value" (error)="$event.target.style.display = 'none'"
+                              (load)="$event.target.style.display = 'block'">
+                          </ion-avatar>
+
+                          <ion-label class="ion-text-wrap">
+                            <span
+                              [innerHTML]="rule.get('name').value ? rule.get('name').value : '<em>Empty rule</em>'"></span>
+                            <p *ngIf="rule.get('maxFired').value && rule.get('withinPeriod').value">
+                              Maximum {{ rule.get('maxFired').value }}&times; per
+                              {{ rule.get('withinPeriod').value === 1 ? 'day' :
+                              rule.get('withinPeriod').value
+                              === 7 ? 'week' : rule.get('withinPeriod').value + ' days' }}
+                            </p>
+                          </ion-label>
+
+                          <ion-chip *ngIf="rule.get('points').value; let points; else NO_POINTS;" slot="end">
+                            <ion-label><strong *ngIf="points > 0">+</strong><strong>{{ points }}</strong></ion-label>
+                          </ion-chip>
+                          <ng-template #NO_POINTS>
+                            <ion-chip slot="end">
+                              <ion-label><strong>+?</strong></ion-label>
+                            </ion-chip>
+                          </ng-template>
+
+                          <ion-reorder slot="end"></ion-reorder>
+                        </ion-item>
+
+                        <ion-item-options side="end">
+                          <ion-item-option (click)="removeChildForm('tasks', t)" color="danger">
+                            <ion-icon slot="icon-only" name="trash"></ion-icon>
+                          </ion-item-option>
+                        </ion-item-options>
+                      </ion-item-sliding>
+
+                      <div class="sliding-item-details" *ngIf="rule.get('isOpen').value">
+                        <ion-card mode="md">
+                          <ion-list>
+
+                            <ion-item lines="inset">
+                              <ion-label position="stacked">Name</ion-label>
+                              <ion-textarea rows="1" auto-grow="true" formControlName="name"></ion-textarea>
+                            </ion-item>
+                            <ion-item lines="inset" *ngIf="view.nonrequired">
+                              <ion-label position="stacked">Image</ion-label>
+                              <ion-input type="text" formControlName="image"></ion-input>
+                            </ion-item>
+
+                            <ion-item lines="inset">
+                              <ion-label>
+                                <p>Types</p>
+                              </ion-label>
+                              <ion-select interface="popover" multiple formControlName="types">
+                                <ion-select-option *ngFor="let atype of atypes" [value]="atype">
+                                  {{ atype }}
+                                </ion-select-option>
+                              </ion-select>
+                            </ion-item>
+                            <ion-item lines="inset">
+                              <ion-label>
+                                <p>Providers</p>
+                              </ion-label>
+                              <ion-select interface="popover" multiple formControlName="providers">
+                                <ion-select-option *ngFor="let provider of providers" [value]="provider">
+                                  {{ provider }}
+                                </ion-select-option>
+                              </ion-select>
+                            </ion-item>
+                            <ion-item lines="full">
+                              <ion-label>
+                                <p>Reward</p>
+                              </ion-label>
+                              <ion-input type="number" formControlName="points" style="text-align: right;"></ion-input>
+                              <ion-note slot="end" style="margin: 0; padding-left: 8px;">points</ion-note>
+                            </ion-item>
+
+
+                            <ion-item-divider style="margin-top: 32px;">
+                              <ion-label>Firing conditions</ion-label>
+                            </ion-item-divider>
+                            <div style="display: flex; flex: 1;">
+                              <ion-item lines="inset" style="width: 50%;">
+                                <ion-label position="stacked">Max. times fired?</ion-label>
+                                <ion-input type="number" formControlName="maxFired"></ion-input>
+                              </ion-item>
+                              <ion-item lines="inset" style="width: 50%;">
+                                <ion-label position="stacked">Min. days betw. fire?</ion-label>
+                                <ion-input type="number" formControlName="withinPeriod"></ion-input>
+                              </ion-item>
+                            </div>
+
+
+                            <ion-item-divider style="margin-top: 32px;">
+                              <ion-label>Reward conditions</ion-label>
+                            </ion-item-divider>
+                            <ion-item lines="inset">
+                              <ion-label class="ion-text-wrap">
+                                <p>Secret?</p>
+                              </ion-label>
+                              <ion-input type="text" formControlName="hasSecret" style="text-align: right;"></ion-input>
+                            </ion-item>
+                            <ion-item lines="inset">
+                              <ion-label class="ion-text-wrap">
+                                <p>Picture required?</p>
+                              </ion-label>
+                              <ion-toggle color="primary" formControlName="requiresImage" slot="end"></ion-toggle>
+                            </ion-item>
+                            <ion-item lines="inset">
+                              <ion-label class="ion-text-wrap">
+                                <p>Video required?</p>
+                              </ion-label>
+                              <ion-toggle color="primary" formControlName="requiresVideo" slot="end"></ion-toggle>
+                            </ion-item>
+                            <ion-item lines="inset">
+                              <ion-label class="ion-text-wrap">
+                                <p>Description required?</p>
+                              </ion-label>
+                              <ion-toggle color="primary" formControlName="requiresDescription" slot="end"></ion-toggle>
+                            </ion-item>
+                            <ion-item lines="inset">
+                              <ion-label class="ion-text-wrap">
+                                <p>Min. duration?</p>
+                              </ion-label>
+                              <ion-input type="number" formControlName="minDuration" style="text-align: right;">
+                              </ion-input>
+                              <ion-note slot="end" style="margin: 0; padding-left: 8px;">seconds</ion-note>
+                            </ion-item>
+                            <ion-item lines="full">
+                              <ion-label class="ion-text-wrap">
+                                <p>Min. nr. steps?</p>
+                              </ion-label>
+                              <ion-input type="number" formControlName="minSteps" style="text-align: right;">
+                              </ion-input>
+                              <ion-note slot="end" style="margin: 0; padding-left: 8px;">steps</ion-note>
+                            </ion-item>
+
+                          </ion-list>
+                        </ion-card>
+                      </div>
+
+                    </ng-container>
+                  </ng-container>
+
+                </ion-reorder-group>
+
+              </ion-list>
+            </ion-card>
+
+
+
+
+
+            <ion-card mode="md" *ngIf="config?.rewards?.length">
+              <ion-card-header>
+                <ion-card-title style="display: flex; justify-content: space-between;">
+                  Lotteries ({{ form.get('lotteries')['controls'].length }})
+                  <div>
+                    <ion-icon name="add" (click)="addChildForm('lotteries')" color="primary"></ion-icon>
+                    <ion-icon name="trash-outline" (click)="resetChildForms('lotteries')" color="danger"></ion-icon>
+                  </div>
+                </ion-card-title>
+
+              </ion-card-header>
+              <ion-list lines="full">
+
+                <ion-reorder-group (ionItemReorder)="reorderChildForms('lotteries', $event)" disabled="false">
+
+                  <ng-container formArrayName="lotteries">
+                    <ng-container *ngFor="let lottery of form.get('lotteries')['controls']; let l = index"
+                      [formGroupName]="l">
+
+                      <ion-item-sliding #item>
+                        <ion-item (click)="lottery.get('isOpen').value = !lottery.get('isOpen').value">
+                          <ion-avatar slot="start" *ngIf="lottery.get('image').value">
+                            <img [src]="lottery.get('image').value" (error)="$event.target.style.display = 'none'"
+                              (load)="$event.target.style.display = 'block'">
+                          </ion-avatar>
+
+                          <ion-label class="ion-text-wrap">
+                            <span
+                              [innerHTML]="lottery.get('name').value ? lottery.get('name').value : '<em>Empty lottery</em>'"></span>
+                            <p *ngIf="lottery.get('maxFired').value && lottery.get('withinPeriod').value">
+                              Maximum {{ lottery.get('maxFired').value }}&times; per
+                              {{ lottery.get('withinPeriod').value === 1 ? 'day' :
+                              lottery.get('withinPeriod').value
+                              === 7 ? 'week' : lottery.get('withinPeriod').value + ' days' }}
+                            </p>
+                          </ion-label>
+
+                          <ion-chip *ngIf="lottery.get('cost').value; let cost; else UNK_COST;" slot="end">
+                            <ion-label><strong>-{{ cost }}</strong></ion-label>
+                          </ion-chip>
+                          <ng-template #UNK_COST>
+                            <ion-chip slot="end">
+                              <ion-label><strong>-?</strong></ion-label>
+                            </ion-chip>
+                          </ng-template>
+
+                          <ion-reorder slot="end"></ion-reorder>
+                        </ion-item>
+
+                        <ion-item-options side="end">
+                          <ion-item-option (click)="removeChildForm('lotteries', l)" color="danger">
+                            <ion-icon slot="icon-only" name="trash"></ion-icon>
+                          </ion-item-option>
+                        </ion-item-options>
+                      </ion-item-sliding>
+
+                      <div class="sliding-item-details" *ngIf="lottery.get('isOpen').value">
+                        <ion-card mode="md">
+                          <ion-list>
+                            <ion-item lines="inset">
+                              <ion-label>
+                                <p>Name</p>
+                              </ion-label>
+                              <ion-input type="text" formControlName="name" style="text-align: right;"></ion-input>
+                            </ion-item>
+                            <ion-item lines="inset" *ngIf="view.nonrequired">
+                              <ion-label position="stacked">Image</ion-label>
+                              <ion-input type="text" formControlName="image"></ion-input>
+                            </ion-item>
+                            <ion-item lines="full">
+                              <ion-label>
+                                <p>Min. nr points required</p>
+                              </ion-label>
+                              <ion-input type="number" formControlName="cost" style="text-align: right;"></ion-input>
+                            </ion-item>
+
+
+                            <ng-container *ngIf="view.nonrequired">
+                              <ion-item-divider style="margin-top: 32px;">
+                                <ion-label>Firing conditions</ion-label>
+                              </ion-item-divider>
+                              <div style="display: flex; flex: 1;">
+                                <ion-item lines="inset" style="width: 50%;">
+                                  <ion-label position="stacked">Max. times fired?</ion-label>
+                                  <ion-input type="number" formControlName="maxFired"></ion-input>
+                                </ion-item>
+                                <ion-item lines="inset" style="width: 50%;">
+                                  <ion-label position="stacked">Min. days betw. fire?</ion-label>
+                                  <ion-input type="number" formControlName="withinPeriod"></ion-input>
+                                </ion-item>
+                              </div>
+                            </ng-container>
+
+                          </ion-list>
+                        </ion-card>
+                      </div>
+
+                    </ng-container>
+                  </ng-container>
+
+                </ion-reorder-group>
+
+              </ion-list>
+            </ion-card>
+
+
+
+            <ion-card mode="md" *ngIf="config?.rewards?.length">
+              <ion-card-header>
+                <ion-card-title style="display: flex; justify-content: space-between;">
+                  Rewards ({{ form.get('rewards')['controls'].length }})
+                  <div>
+                    <ion-icon name="add" (click)="addChildForm('rewards')" color="primary"></ion-icon>
+                    <ion-icon name="trash-outline" (click)="resetChildForms('rewards')" color="danger"></ion-icon>
+                  </div>
+                </ion-card-title>
+
+              </ion-card-header>
+              <ion-list lines="full">
+
+                <ion-reorder-group (ionItemReorder)="reorderChildForms('rewards', $event)" disabled="false">
+
+                  <ng-container formArrayName="rewards">
+                    <ng-container *ngFor="let reward of form.get('rewards')['controls']; let r = index"
+                      [formGroupName]="r">
+
+                      <ion-item-sliding #item>
+                        <ion-item (click)="reward.get('isOpen').value = !reward.get('isOpen').value">
+                          <ion-avatar slot="start" *ngIf="reward.get('prize').value?.image">
+                            <img [src]="reward.get('prize').value?.image" (error)="$event.target.style.display = 'none'"
+                              (load)="$event.target.style.display = 'block'">
+                          </ion-avatar>
+
+                          <ion-label class="ion-text-wrap">
+                            <span
+                              [innerHTML]="reward.get('prize').value ? (reward.get('amount').value > 999 ? '&infin; ' : reward.get('amount').value) + '&times; ' + reward.get('prize').value?.name : '<em>Empty reward</em>'"></span>
+                            <p *ngIf="reward.get('lottery').value">
+                              Distributed in {{ reward.get('lottery').value }}
+                              with odd of {{ reward.get('odd').value }}
+                            </p>
+                          </ion-label>
+
+                          <ion-reorder slot="end"></ion-reorder>
+                        </ion-item>
+
+                        <ion-item-options side="end">
+                          <ion-item-option (click)="removeChildForm('rewards', r)" color="danger">
+                            <ion-icon slot="icon-only" name="trash"></ion-icon>
+                          </ion-item-option>
+                        </ion-item-options>
+                      </ion-item-sliding>
+
+                      <div class="sliding-item-details" *ngIf="reward.get('isOpen').value">
+                        <ion-card mode="md">
+                          <ion-list>
+
+                            <ion-item>
+                              <ion-label>
+                                <p>Prize</p>
+                              </ion-label>
+                              <ion-select interface="popover" formControlName="prize">
+                                <ion-select-option *ngFor="let reward of config.rewards" [value]="reward">{{ reward.name
+                                  }}</ion-select-option>
+                              </ion-select>
+                            </ion-item>
+
+                            <ion-item lines="full">
+                              <ion-label>
+                                <p>Amount</p>
+                              </ion-label>
+                              <ion-input type="number" formControlName="amount" style="text-align: right;"></ion-input>
+                            </ion-item>
+
+
+                            <ng-container *ngIf="form.get('lotteries')['controls']?.length">
+                              <ion-item-divider style="margin-top: 32px;">
+                                <ion-label>Lottery association</ion-label>
+                              </ion-item-divider>
+                              <div style="display: flex; flex: 1;">
+                                <ion-item lines="inset" style="width: 50%;">
+                                  <ion-label position="stacked">Lottery?</ion-label>
+                                  <ion-select interface="popover" formControlName="lottery">
+                                    <ion-select-option [value]="null">(null)</ion-select-option>
+                                    <ion-select-option *ngFor="let lottery of form.get('lotteries').value"
+                                      [value]="lottery.name">{{ lottery.name}}</ion-select-option>
+                                  </ion-select>
+                                </ion-item>
+                                <ion-item lines="inset" style="width: 50%;">
+                                  <ion-label position="stacked">Odd?</ion-label>
+                                  <ion-input type="number" formControlName="odd"></ion-input>
+                                </ion-item>
+                              </div>
+                            </ng-container>
+
+                          </ion-list>
+                        </ion-card>
+                      </div>
+
+                    </ng-container>
+                  </ng-container>
+
+                </ion-reorder-group>
+
+
+              </ion-list>
+            </ion-card>
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+            <ion-card mode="md">
+              <ion-card-header>
+                <ion-card-title style="display: flex; justify-content: space-between;">
+                  Participations
+                  (indiv. = {{ countParticipations('individuals') }}, teams = {{ countParticipations('teams') }})
+                  <div>
+                    <ion-icon name="trash-outline" (click)="parseCircles()" color="danger"></ion-icon>
+                  </div>
+                </ion-card-title>
+              </ion-card-header>
+              <!-- <ion-list>
+                <ion-item>
+                  <ion-label>
+                    <p>Generate a challenge for each distinct participation?</p>
+                  </ion-label>
+                  <ion-toggle formControlName="createChallengePerParticipant" color="primary" slot="end">
+                  </ion-toggle>
+                </ion-item>
+              </ion-list> -->
+              <ion-card-content>
+                <ion-segment [(ngModel)]="view.participations" [ngModelOptions]="{standalone: true}" mode="ios">
+                  <ion-segment-button value="individuals">
+                    <ion-label>Individuals</ion-label>
+                  </ion-segment-button>
+                  <ion-segment-button value="teams">
+                    <ion-label>Teams</ion-label>
+                  </ion-segment-button>
+                  <ion-segment-button value="individualsOfTeams">
+                    <ion-label>Individuals of Teams</ion-label>
+                  </ion-segment-button>
+                </ion-segment>
+              </ion-card-content>
+              <ion-list *ngIf="view.participations === 'individuals'">
+                <ion-item *ngFor="let individual of circles.individuals">
+                  <ion-avatar slot="start" [routerLink]="['/activities/', individual.pid]">
+                    <img [src]="individual.image"
+                      (error)="$event.target.src = uris.assets + '/placeholders/ph-fa-' + (individual.pid % 10) + '.svg'">
+                  </ion-avatar>
+                  <ion-label>
+                    {{ individual.firstname + ' ' + individual.lastname }}
+                  </ion-label>
+                  <ion-icon *ngIf="individual.inTeam" name="checkbox-outline" color="secondary"
+                    style="margin-right: 8px;"></ion-icon>
+                  <ion-checkbox [(ngModel)]="individual.selected" [ngModelOptions]="{standalone: true}"></ion-checkbox>
+                </ion-item>
+              </ion-list>
+
+
+
+              <ion-list *ngIf="view.participations === 'teams'">
+                <ion-item *ngFor="let team of circles.teams">
+                  <ion-avatar slot="start">
+                    <img [src]="team.image" (error)="$event.target.src = uris.assets + '/placeholders/ph-group.svg'">
+                  </ion-avatar>
+                  <ion-label>
+                    {{ team.name }}
+                    <p>{{ team.size }} members</p>
+                  </ion-label>
+                  <ion-checkbox [(ngModel)]="team.selected" [ngModelOptions]="{standalone: true}"></ion-checkbox>
+                </ion-item>
+              </ion-list>
+
+
+              <ion-list *ngIf="view.participations === 'individualsOfTeams'">
+                <ion-item *ngFor="let team of circles.individualsOfTeams">
+                  <!-- detail (click)="selectIndividualsOfTeams([team.cid])" -->
+                  <ion-avatar slot="start">
+                    <img [src]="team.image" (error)="$event.target.src = uris.assets + '/placeholders/ph-group.svg'">
+                  </ion-avatar>
+                  <ion-label>
+                    {{ team.name }}
+                    <p>{{ team.size }} members</p>
+                  </ion-label>
+                  <ion-checkbox [(ngModel)]="team.selected" (ionChange)="selectIndividualsOfTeams()"
+                    [ngModelOptions]="{standalone: true}"></ion-checkbox>
+                </ion-item>
+              </ion-list>
+            </ion-card>
+
+
+          </form>
+
+        </ng-container>
+
+      </ion-col>
+    </ion-row>
+  </ion-grid>
+
+
+  <ion-fab *ngIf="isReady" vertical="bottom" horizontal="end" slot="fixed">
+    <ion-fab-button color="secondary" [disabled]="isLocked || !form.valid || !countParticipations('all')"
+      (click)="createChallenges()">
+      <ion-spinner *ngIf="isLocked; else label;"></ion-spinner>
+      <ng-template #label>
+        <ion-icon name="send"></ion-icon>
+      </ng-template>
+    </ion-fab-button>
+  </ion-fab>
+
+</ion-content>

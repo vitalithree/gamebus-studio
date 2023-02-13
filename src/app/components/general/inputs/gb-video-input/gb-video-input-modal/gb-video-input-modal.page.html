@@ -1,0 +1,41 @@
+<ion-header>
+  <ion-toolbar style="--background: #000;">
+    <ion-buttons slot="start">
+      <ion-button color="light" (click)="closeModal()" [disabled]="isUploading">
+        {{ "g.cancel" | translate }}
+      </ion-button>
+    </ion-buttons>
+    <ion-buttons slot="end">
+      <ion-button *ngIf="uri.external" class="select-button">
+        {{ "c.g.inputs.select" | translate }}
+      </ion-button>
+    </ion-buttons>
+  </ion-toolbar>
+</ion-header>
+
+<ion-content [ngClass]="{ ready: ready, isRecording: isRecording, isUploading: isUploading }">
+
+  <div class="upload-spinner" *ngIf="!ready || isUploading">
+    <ion-spinner color="light"></ion-spinner>
+  </div>
+
+  <ion-fab class="record-button" *ngIf="!uri.external" mode="ios" vertical="bottom" horizontal="center" slot="fixed">
+    <ion-fab-button class="record" *ngIf="!isRecording" (click)="record()">
+    </ion-fab-button>
+    <ion-fab-button *ngIf="isRecording" (click)="stop()">
+      <ion-icon name="stop"></ion-icon>
+    </ion-fab-button>
+  </ion-fab>
+
+  <ion-fab class="rotate-button" mode="ios" vertical="bottom" horizontal="end" slot="fixed">
+    <ion-fab-button fill="clear" (click)="rotate()">
+      <ion-icon name="sync-outline"></ion-icon>
+    </ion-fab-button>
+  </ion-fab>
+
+</ion-content>
+
+<ion-footer>
+  <ion-toolbar style="--background: #000;">
+  </ion-toolbar>
+</ion-footer>

@@ -1,0 +1,153 @@
+ion-card-content {
+  h3 {
+    font-size: 44px;
+    font-weight: bold;
+  }
+
+  h4 {
+    font-size: 14px;
+    text-transform: uppercase;
+  }
+
+  &.split {
+    display: flex;
+    flex-direction: column;
+    align-items: center;
+    padding: 0;
+
+    @media (min-width: 576px) {
+      flex-direction: row;
+    }
+
+    > div {
+      width: 100%;
+      padding: 16px;
+
+      @media (min-width: 576px) {
+        width: 50%;
+
+        &:first-child {
+          border-right: 1px solid var(--ion-color-step-150, #d7d8da);
+        }
+      }
+
+      .loot {
+        position: relative;
+        height: 120px;
+        margin: 8px 0 58px 0;
+        padding: 0;
+        text-align: center;
+        width: 100%;
+
+        img {
+          max-height: 120px;
+          margin: 4px auto;
+          z-index: 9;
+          animation: puff-in-center 1s cubic-bezier(0.165, 0.84, 0.44, 1) both;
+
+          &.closed {
+            animation: float 4s ease-in-out infinite;
+          }
+        }
+
+        &.isSpinning img {
+          animation: spin 500ms linear infinite,
+            blur 5s cubic-bezier(0.2, 0, 0.75, 1);
+        }
+
+        &:before {
+          content: "";
+          position: absolute;
+          bottom: 30px;
+          left: 50%;
+          width: 160px;
+          height: 15px;
+          margin-left: -80px;
+          border-radius: 50%;
+          box-shadow: 0 50px 25px rgba(0, 0, 0, 0.5);
+        }
+      }
+    }
+  }
+
+  &.position > div {
+    margin-top: 16px;
+    padding: 16px;
+    text-align: center;
+    background-color: var(--ion-color-light);
+    border-radius: 24px;
+
+    > div {
+      min-height: 100px;
+      display: flex;
+      flex-wrap: wrap;
+      justify-content: space-around;
+      align-items: center;
+
+      img {
+        width: 44px;
+        height: 44px;
+      }
+    }
+  }
+}
+
+@keyframes float {
+  0% {
+    transform: translatey(0px);
+  }
+
+  50% {
+    transform: translatey(-20px);
+  }
+
+  100% {
+    transform: translatey(0px);
+  }
+}
+
+@keyframes spin {
+  from {
+    transform: rotate(0deg);
+  }
+
+  to {
+    transform: rotate(360deg);
+  }
+}
+
+@keyframes blur {
+  0% {
+    filter: blur(0);
+  }
+
+  20% {
+    filter: blur(4px);
+  }
+
+  40% {
+    filter: blur(8px);
+  }
+
+  60% {
+    filter: blur(8px);
+  }
+
+  80% {
+    filter: blur(4px);
+  }
+}
+
+@keyframes puff-in-center {
+  0% {
+    transform: scale(2);
+    filter: blur(4px);
+    opacity: 0;
+  }
+
+  100% {
+    transform: scale(1);
+    filter: blur(0px);
+    opacity: 1;
+  }
+}

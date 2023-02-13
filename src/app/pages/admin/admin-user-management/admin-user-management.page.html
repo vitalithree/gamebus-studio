@@ -1,0 +1,118 @@
+<app-header [segments]="[
+{name: 'Users', route: '/admin/dashboards/users', direction: 'forward'},
+{name: 'Groups', route: '/admin/dashboards/groups', direction: 'forward'},
+{name: 'Tasks', route: '/admin/dashboards/tasks', direction: 'forward'},
+{name: 'Challenges', route: '/admin/dashboards/challenges', direction: 'forward'},
+]">
+</app-header>
+<ion-content>
+
+  <ion-refresher slot="fixed" (ionRefresh)="parseData(true, $event)">
+    <ion-refresher-content></ion-refresher-content>
+  </ion-refresher>
+
+  <ion-grid class="ion-no-padding">
+    <ion-row style="justify-content: center;">
+      <ion-col size="12" size-md="9" class="ion-no-padding">
+
+        <ng-template #loading>
+          <ion-spinner></ion-spinner>
+        </ng-template>
+
+        <ng-container *ngIf="isReady; else loading">
+          <ion-card mode="md" *ngFor="let user of users.enrolled">
+            <ion-list>
+              <ion-item class="user-item" (click)="updateView(user.uid)">
+                <ion-avatar slot="start" [routerLink]="['/activities/', user.pid]">
+                  <img [src]="user.image"
+                    (error)="$event.target.src = uris.assets + '/placeholders/ph-fa-' + (user.pid % 10) + '.svg'">
+                </ion-avatar>
+                <ion-label class="ion-text-wrap">
+                  {{ user.firstname + ' ' + user.lastname }}
+                  <p>
+                    uid = {{ user.uid }}, pid = {{ user.pid }}
+                  </p>
+                  <p>
+                    <span [ngClass]="{ 'text-danger': user.circles?.studyarm?.length !== 1 }">
+                      arms = {{ user.circles?.studyarm?.length || 0 }}</span>,
+                    <span [ngClass]="{ 'text-danger': !user.challenges?.length }">
+                      xs = {{ user.challenges?.length || 0 }}
+                    </span>
+                  </p>
+                </ion-label>
+
+                <ion-icon *ngIf="!view.includes(user.uid)" slot="end" size="small" name="caret-down"></ion-icon>
+                <ion-icon *ngIf="view.includes(user.uid)" slot="end" size="small" name="caret-up"></ion-icon>
+              </ion-item>
+
+              <ion-item-group *ngIf="view.includes(user.uid)">
+
+                <ng-container *ngFor="let gtype of gtypes">
+                  <ion-item-divider (click)="promptCircleSelect(gtype, user, $event)">
+                    <ion-label>Group type = {{ gtype }}</ion-label>
+                    <ion-icon slot="end" name="add-circle-outline"></ion-icon>
+                  </ion-item-divider>
+
+                  <ng-container *ngIf="user.circles[gtype]?.length">
+                    <ion-item-sliding class="circle-item" *ngFor="let circle of user.circles[gtype]">
+                      <ion-item>
+                        <ion-label class="ion-text-wrap">
+                          {{ circle.name }}
+                          <p>cid = {{ circle.id}}, mid = {{ circle.mid}}, {{ circle.leads ? 'leader' : 'regular member'
+                            }}
+                          </p>
+                        </ion-label>
+                      </ion-item>
+
+                      <ion-item-options side="end">
+                        <ion-item-option
+                          (click)="updateMembership('remove', [user.pid], circle.mid, circle.cid, $event)"
+                          color="danger">
+                          Remove membership
+                        </ion-item-option>
+                      </ion-item-options>
+                    </ion-item-sliding>
+                  </ng-container>
+                </ng-container>
+
+
+
+
+                <ion-item-divider (click)="promptChallengeSelect(user.uid, $event)">
+                  <ion-label>Challenge(s)</ion-label>
+                  <ion-icon slot="end" name="add-circle-outline"></ion-icon>
+                </ion-item-divider>
+                <ion-item-sliding class="circle-item" *ngFor="let challenge of user.challenges">
+                  <ion-item [routerLink]="['/admin/dashboards/challenges', challenge.id]" routerDirection="forward">
+                    <ion-avatar slot="start">
+                      <img [src]="challenge.image"
+                        (error)="$event.target.src = uris.assets + '/placeholders/ph-challenge.svg'">
+                    </ion-avatar>
+                    <ion-label class="ion-text-wrap">
+                      {{ challenge.name }} <span class="state-tag">{{ challenge.points }}</span>
+                      <p>
+                        xid = {{ challenge.id }}, cid = {{ challenge.cid }},
+                        prtcptn. {{ challenge.isPrivate ? 'as individual' : 'as team'}}
+                      </p>
+                    </ion-label>
+                  </ion-item>
+
+                  <ion-item-options side="end">
+                    <ion-item-option color="danger" (click)="removeParticipation(challenge.id, challenge.cid, $event)">
+                      Remove participation
+                    </ion-item-option>
+                  </ion-item-options>
+                </ion-item-sliding>
+
+
+
+              </ion-item-group>
+            </ion-list>
+
+          </ion-card>
+        </ng-container>
+
+      </ion-col>
+    </ion-row>
+  </ion-grid>
+</ion-content>

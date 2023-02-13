@@ -1,0 +1,215 @@
+<ion-app>
+  <div *ngIf="points?.length" (click)="points = null;" class="fireworks">
+    <div class="pyro">
+      <div class="before"></div>
+      <div class="after"></div>
+    </div>
+
+    <div class="container">
+      <ion-card mode="md">
+        <ion-card-header>
+          <ion-card-title style="display: flex; justify-content: space-between;">
+            {{ "a.congratulations" | translate }}
+            <ion-icon name="close" (click)="points = null;"></ion-icon>
+          </ion-card-title>
+          <ion-card-subtitle>
+            {{ "a.congratulations-1" | translate }}
+            {{ "a.congratulations-2" | translate }}
+          </ion-card-subtitle>
+        </ion-card-header>
+        <ion-list>
+          <ion-item *ngFor="let pp of points">
+            <ion-avatar slot="start" *ngIf="pp.challengeRule.image">
+              <img [src]="pp.challengeRule.image" (error)="$event.target.style.display = 'none'">
+            </ion-avatar>
+            <ion-label class="ion-text-wrap">
+              {{ pp.challengeRule.name }}
+            </ion-label>
+            <ion-chip *ngIf="pp.value !== 0" slot="end">
+              <ion-label><strong *ngIf="pp.value > 0">+</strong><strong>{{ pp.value }}</strong>
+                {{ "g.points-abbr" | translate }}</ion-label>
+            </ion-chip>
+          </ion-item>
+        </ion-list>
+      </ion-card>
+    </div>
+  </div>
+
+  <div class="modal" *ngIf="view.noconnection" (click)="view.noconnection= null;">
+    <div class="container">
+      <ion-card mode="md">
+        <ion-card-header>
+          <svg width="80px" height="80px" viewBox="0 0 512 512" version="1.1" xmlns="http://www.w3.org/2000/svg"
+            xmlns:xlink="http://www.w3.org/1999/xlink" xml:space="preserve" xmlns:serif="http://www.serif.com/"
+            style="fill-rule:evenodd;clip-rule:evenodd;stroke-linecap:round;stroke-linejoin:round;">
+            <path
+              d="M332.41,310.59C289.049,272.049 222.971,272.049 179.61,310.59M393.46,249.54C316.528,177.603 195.472,177.603 118.54,249.54M447.72,182.11C339.015,85.136 172.985,85.136 64.28,182.11"
+              style="fill:none;fill-rule:nonzero;stroke:#8395a7;stroke-width:32px;" />
+            <path
+              d="M256,416C238.445,416 224,401.555 224,384C224,366.445 238.445,352 256,352C273.555,352 288,366.445 288,384C288,401.555 273.555,416 256,416Z"
+              style="fill:#8395a7;fill-rule:nonzero;stroke:#8395a7;stroke-width:1px;stroke-linecap:butt;stroke-miterlimit:2;" />
+            <path d="M130.141,375.512L420.642,95.097"
+              style="fill:none;stroke:#ee5253;stroke-width:32px;stroke-linejoin:miter;" />
+          </svg>
+
+          <ion-card-title>
+            {{ "a.no-connection-1" | translate }}
+          </ion-card-title>
+          <ion-card-subtitle>
+            {{ "a.no-connection-2" | translate }}
+          </ion-card-subtitle>
+        </ion-card-header>
+      </ion-card>
+    </div>
+  </div>
+
+  <!-- <div *ngIf="rewards && rewards.length > 0" (click)="rewards = null;" class="fireworks">
+    <div class="pyro">
+      <div class="before"></div>
+      <div class="after"></div>
+    </div>
+
+    <div class="container">
+      <div class="reward">
+        <ion-slides [pager]="rewards.length > 1 ? true : false">
+          <ion-slide *ngFor="let reward of rewards">
+            <div class="reward-container gradient">
+              <img *ngIf="reward.image" [src]="reward.image">
+              <p>{{ reward.name }}</p>
+            </div>
+          </ion-slide>
+        </ion-slides>
+      </div>
+      <ion-card mode="md">
+        <ion-card-header>
+          <ion-card-title style="display: flex; justify-content: space-between;">
+            {{ "home.congratulations3" | translate }}
+            <ion-icon name="close" (click)="rewards = null;"></ion-icon>
+          </ion-card-title>
+          <ion-card-subtitle>
+            {{ "home.congratulations4" | translate }}
+          </ion-card-subtitle>
+
+        </ion-card-header>
+
+      </ion-card>
+    </div>
+  </div> -->
+
+
+
+  <ion-tab-bar *ngIf="permissions.isAuthenticated && config">
+
+    <ng-container *ngIf="tpis?.length">
+      <ng-container *ngFor="let page of tpis">
+        <ion-tab-button [routerLink]="page.route" [queryParams]="page.q" routerDirection="root"
+          routerLinkActive="tab-selected">
+          <ion-icon [name]="page.icon"></ion-icon>
+        </ion-tab-button>
+      </ng-container>
+    </ng-container>
+
+    <ion-tab-button routerLink="/account" routerDirection="root" routerLinkActive="tab-selected">
+      <ion-icon name="person-circle-outline"></ion-icon>
+      <div class="badge" *ngIf="state && state.alerts && state.alerts.unread && state.alerts.unread.all > 0">
+        {{ state.alerts.unread.all >= 99 ? '99+' : state.alerts.unread.all }}
+      </div>
+    </ion-tab-button>
+
+  </ion-tab-bar>
+
+
+
+
+  <ion-split-pane when="lg" contentId="main-content">
+
+    <ion-menu contentId="main-content" menuId="side" type="overlay" swipe-gesture="false">
+      <ion-content mode="md">
+
+        <ion-list lines="none" class="header-list">
+          <ion-menu-toggle auto-hide="false" *ngIf="permissions.isAuthenticated">
+            <ion-item routerLink="/account" routerDirection="root" routerLinkActive="selected" detail="false">
+              <ion-thumbnail slot="start">
+                <img [src]="user.details?.image"
+                  (error)="$event.target.src = uris.assets + '/placeholders/ph-user.svg'">
+              </ion-thumbnail>
+              <ion-label>
+                <p>{{ "a.my-account" | translate }}</p>
+                {{ user.details?.firstname + ' ' + user.details?.lastname }}
+              </ion-label>
+              <ion-note slot="end" *ngIf="state && state.alerts && state.alerts.unread && state.alerts.unread.all > 0">
+                {{ state.alerts.unread.all >= 99 ? '99+' : state.alerts.unread.all }}
+              </ion-note>
+            </ion-item>
+          </ion-menu-toggle>
+        </ion-list>
+
+        <ion-list *ngIf="permissions.isAuthenticated && config" lines="none">
+          <ng-container *ngFor="let page of mpis">
+            <ion-menu-toggle auto-hide="false">
+              <ion-item [routerLink]="page.route" [queryParams]="page.q" routerDirection="root" detail="true"
+                routerLinkActive="selected">
+                <ion-icon *ngIf="page.icon" slot="start" [name]="page.icon"></ion-icon>
+                <ion-label>
+                  {{ page.tk | translate }}
+                </ion-label>
+              </ion-item>
+            </ion-menu-toggle>
+          </ng-container>
+        </ion-list>
+
+
+
+        <ion-list lines="none" *ngIf="permissions.isAuthenticated && permissions.isOrganizer">
+          <ion-list-header>{{ "a.organizer" | translate }}</ion-list-header>
+
+          <ng-container *ngFor="let page of adminmpis">
+            <ion-menu-toggle auto-hide="false">
+              <ion-item [routerLink]="page.route" [queryParams]="page.q" routerDirection="root" detail="true"
+                routerLinkActive="selected">
+                <ion-icon *ngIf="page.icon" slot="start" [name]="page.icon"></ion-icon>
+                <ion-label>
+                  {{ page.tk | translate }}
+                </ion-label>
+              </ion-item>
+            </ion-menu-toggle>
+          </ng-container>
+        </ion-list>
+
+        <ion-list lines="none" *ngIf="permissions.isAdmin">
+          <ion-list-header>{{ "a.admin" | translate }}</ion-list-header>
+
+          <ion-menu-toggle auto-hide="false">
+            <ion-item routerLink="/system-configuration" routerDirection="forward" detail="true"
+              routerLinkActive="selected">
+              <ion-icon slot="start" name="hammer-outline"></ion-icon>
+              <ion-label>
+                {{ 'a.system-configuration' | translate }}
+              </ion-label>
+            </ion-item>
+          </ion-menu-toggle>
+        </ion-list>
+
+      </ion-content>
+
+
+
+      <ion-footer *ngIf="config?.campaign?.href">
+        <ion-menu-toggle auto-hide="true" style="display: block;">
+          <ion-toolbar class="ion-text-center" [routerLink]="['/landing', config.campaign.href]"
+            routerDirection="forward" style="--background: transparent;">
+            <div class="footer-container">
+              <ion-icon name="help-circle-outline"></ion-icon>
+              <ion-label>{{ "a.more-information" | translate }}</ion-label>
+            </div>
+          </ion-toolbar>
+        </ion-menu-toggle>
+      </ion-footer>
+    </ion-menu>
+
+    <ion-router-outlet id="main-content"></ion-router-outlet>
+
+  </ion-split-pane>
+
+
+</ion-app>

@@ -1,0 +1,11 @@
+a {
+    color: var(--ion-color-medium-shade);
+}
+
+.login {
+    ion-item>input {
+        height: 0;
+        border: 0;
+        visibility: hidden;
+    }
+}

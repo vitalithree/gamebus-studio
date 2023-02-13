@@ -1,0 +1,34 @@
+ion-card-header {
+    background-color: var(--ion-color-light);
+    border-bottom: 1px solid var(--ion-color-light-shade);
+}
+
+ion-list {
+    width: 100%;
+
+    &[color=dark] {
+        background-color: var(--ion-color-dark) !important;
+        padding: 8px 0;
+    }
+}
+
+.players-item {
+    ion-label {
+        font-size: .75rem;
+
+        &.ios {
+            font-size: .85rem;
+        }
+    }
+
+    ion-button {
+        position: absolute;
+        right: 4px;
+        bottom: 5px;
+
+        &.ios {
+            bottom: 5px;
+        }
+
+    }
+}
